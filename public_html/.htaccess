@@ -1,0 +1,17 @@
+# Prevent Directory Listing
+Options -Indexes
+
+# Prevent access to private storage if placed inside web root by accident
+RewriteRule ^storage/ - [F,L]
+
+# Prevent access to config, models, services, middleware
+RewriteRule ^app/config/ - [F,L]
+RewriteRule ^models/ - [F,L]
+RewriteRule ^services/ - [F,L]
+RewriteRule ^middleware/ - [F,L]
+RewriteRule ^views/ - [F,L]
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?route=$1 [QSA,L]
