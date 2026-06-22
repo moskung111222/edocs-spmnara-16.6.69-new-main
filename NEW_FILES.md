@@ -3,7 +3,7 @@
 ## Database Migration
 | ไฟล์ | คำอธิบาย |
 |---|---|
-| `upgrade_migration.sql` | Migration script สำหรับเพิ่ม 5 ตาราง + ALTER 2 ตาราง + Seed data |
+| `database/install.sql` | Consolidated full installation script for v2.0 schema (14 tables + defaults) |
 
 ## Models (4 ไฟล์)
 | ไฟล์ | คำอธิบาย |

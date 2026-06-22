@@ -27,7 +27,7 @@
 1. ลงชื่อเข้าใช้งานระบบ DirectAdmin ของโฮสติ้งของท่าน
 2. ไปที่เมนู **MySQL Management** -> คลิก **Create New Database**
 3. ระบุชื่อฐานข้อมูลและชื่อผู้ใช้งาน (เช่น `spm_db`, `spm_user`) จากนั้นสุ่มรหัสผ่านที่ปลอดภัยสูง (บันทึกรหัสผ่านนี้ไว้)
-4. กดสร้างฐานข้อมูล จากนั้นเข้าระบบ **phpMyAdmin** นำเข้าไฟล์ `migration.sql`
+4. กดสร้างฐานข้อมูล จากนั้นเข้าระบบ **phpMyAdmin** นำเข้าไฟล์ `database/install.sql`
 
 ### 2.2 ตั้งค่าการเข้าสิทธิ์ของไดเรกทอรี (Permissions & Security)
 1. เปิด **File Manager** บน DirectAdmin

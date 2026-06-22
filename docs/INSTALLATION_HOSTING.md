@@ -34,8 +34,8 @@
    - Database User: `edocs_user` (จะกลายเป็น `ssssonara_edocs_user`)
    - Password: ใช้ตัวสร้างรหัสผ่านอัตโนมัติ (**บันทึกไว้**)
 3. กดสร้าง → เข้า **phpMyAdmin**
-4. เลือก Database ที่สร้าง → คลิก **Import** → เลือกไฟล์ `migration.sql` จากโปรเจกต์ → Execute
-5. ตรวจสอบว่ามีตาราง 9 ตาราง: `applicants`, `request_types`, `officers`, `requests`, `attachments`, `status_history`, `messages`, `audit_logs`, `otp_verifications`
+4. เลือก Database ที่สร้าง → คลิก **Import** → เลือกไฟล์ `database/install.sql` จากโปรเจกต์ → Execute
+5. ตรวจสอบว่ามีตาราง 14 ตาราง: `applicants`, `departments`, `roles`, `permissions`, `role_permissions`, `officers`, `officer_departments`, `request_types`, `requests`, `attachments`, `status_history`, `messages`, `audit_logs`, `otp_verifications`
 
 ### 2.2 อัปโหลดไฟล์โปรเจกต์
 
@@ -341,7 +341,7 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 ## 5. การตรวจสอบหลังติดตั้ง (Post-Installation Checklist)
 
 ```text
-[ ] ฐานข้อมูลนำเข้าครบ 9 ตาราง + Seed Data
+[ ] ฐานข้อมูลนำเข้าครบ 14 ตาราง + Seed Data
 [ ] .env ตั้งค่าครบ (DB, SMTP, Pusher)
 [ ] SITE_URL ใน config.php ตรงกับโดเมนจริง
 [ ] Private Storage Path ตรงกับ Username จริง
@@ -358,4 +358,4 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 [ ] เปลี่ยนรหัสผ่าน admin/head/staff จากค่าเริ่มต้น
 ```
 
-> ⚠️ **อย่าลืม:** หลังติดตั้งเสร็จ ให้เปลี่ยนรหัสผ่านของบัญชีเจ้าหน้าที่ทุกบัญชีทันที เนื่องจาก Seed Data ใน `migration.sql` ใช้รหัสผ่านทดสอบ (`admin123`, `head123`, `staff123`)
+> ⚠️ **อย่าลืม:** หลังติดตั้งเสร็จ ให้เปลี่ยนรหัสผ่านของบัญชีเจ้าหน้าที่ทุกบัญชีทันที เนื่องจาก Seed Data ใน `database/install.sql` ใช้รหัสผ่านทดสอบ (`admin123`, `head123`, `staff123`)

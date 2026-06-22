@@ -29,8 +29,8 @@
    - **Database Name**: `edocs_spmnara`
    - **Collation**: `utf8mb4_unicode_ci`
 3. นำเข้าไฟล์ SQL โครงสร้างและข้อมูลเริ่มต้น:
-   - นำเข้าไฟล์ [migration.sql](file:///c:/Users/mos/OneDrive/เอกสาร/edocs-spmnara/migration.sql) เข้าไปรันยังฐานข้อมูลที่สร้างขึ้น
-   - สคริปต์นี้จะสถาปนาตารางข้อมูล 9 ตาราง และข้อมูลประเภทคำขอเริ่มต้น รวมถึงบัญชีเจ้าหน้าที่ระดับผู้ดูแลระบบ (Admin)
+   - นำเข้าไฟล์ [install.sql](file:///e:/สำรองระบบ 18.6.69/edocs-spmnara-16.6.69-new-main/edocs-spmnara-16.6.69-new-main/database/install.sql) เข้าไปรันยังฐานข้อมูลที่สร้างขึ้น
+   - สคริปต์นี้จะสถาปนาตารางข้อมูล 14 ตาราง และข้อมูลประเภทคำขอเริ่มต้น รวมถึงบัญชีเจ้าหน้าที่ระดับผู้ดูแลระบบ (Admin)
 
 ---
 
@@ -38,7 +38,7 @@
 โปรดแก้ไขไฟล์การตั้งค่าดังนี้ตามความเหมาะสมของการทดสอบ:
 
 ### 4.1 เชื่อมต่อฐานข้อมูล
-เปิดและแก้ไขข้อมูลในไฟล์ [database.php](file:///c:/Users/mos/OneDrive/เอกสาร/edocs-spmnara/public_html/app/config/database.php)
+เปิดและแก้ไขข้อมูลในไฟล์ [Database.php](file:///e:/สำรองระบบ 18.6.69/edocs-spmnara-16.6.69-new-main/edocs-spmnara-16.6.69-new-main/public_html/app/config/Database.php)
 ```php
 $host = '127.0.0.1';
 $user = 'root';
