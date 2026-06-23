@@ -51,10 +51,11 @@ spl_autoload_register(function ($class) {
 use App\Config\Database;
 use App\Config\Config;
 
-$backupDir = dirname(__DIR__) . '/edocs-spmnara/backups/';
-if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-    // Production path outside public_html on hosting
-    $backupDir = '/home/account/private_storage/backups/';
+$backupDir = \App\Config\Env::get('BACKUP_DIR');
+if (empty($backupDir)) {
+    // Dynamically resolve to project_root/private_storage/backups/
+    // Works on both Windows and Linux out-of-the-box
+    $backupDir = __DIR__ . '/private_storage/backups/';
 }
 
 // Ensure backup directory exists

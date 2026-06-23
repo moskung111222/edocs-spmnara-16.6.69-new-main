@@ -23,16 +23,17 @@ class Config {
     public const UPLOAD_MAX_SIZE = 10 * 1024 * 1024; // 10MB
     public const ALLOWED_MIME_TYPES = ['application/pdf'];
     
-    // Private storage path - outside public_html.
-    // For Windows local environment, it resolves to a sister folder of public_html named private_storage.
-    // For DirectAdmin, it will fallback to the account-wide private storage folder.
+    // Private storage path - outside public_html by default.
+    // Can be overridden via PRIVATE_STORAGE_PATH environment variable in .env.
     public static function getPrivateStoragePath() {
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            return dirname(__DIR__, 3) . '/private_storage/documents/';
-        } else {
-            // DirectAdmin path outside public_html (make sure account matches your actual hosting account)
-            return '/home/account/private_storage/documents/';
+        $envPath = Env::get('PRIVATE_STORAGE_PATH');
+        if (!empty($envPath)) {
+            return rtrim($envPath, '/') . '/';
         }
+        
+        // Dynamically resolve to project_root/private_storage/documents/
+        // Works on both Windows and Linux out-of-the-box
+        return dirname(__DIR__, 3) . '/private_storage/documents/';
     }
     
     // Request status constants
