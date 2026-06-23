@@ -1,116 +1,129 @@
-# Database Schema
+# Database Schema (โครงสร้างฐานข้อมูล)
 
-โครงสร้างฐานข้อมูลของระบบประกอบด้วย 9 ตาราง ภายใต้ระบบจัดการฐานข้อมูล MySQL/MariaDB โดยรองรับการบันทึกข้อความภาษาไทยเต็มรูปแบบด้วยคอลเลกชัน `utf8mb4_unicode_ci`
-
----
-
-## 1. รายละเอียดตารางข้อมูล (Tables)
-
-### 1.1 `applicants` (ข้อมูลประชาชนผู้ยื่นคำขอ)
-เก็บข้อมูลส่วนบุคคลและข้อมูลติดต่อของประชาชนที่เข้าใช้งานระบบ
-- `id` (INT, Primary Key, Auto Increment)
-- `full_name` (VARCHAR(255), Not Null) - ชื่อ-นามสกุลจริง
-- `email` (VARCHAR(255), Unique, Not Null) - อีเมลที่รับ OTP
-- `phone` (VARCHAR(20), Not Null) - เบอร์โทรศัพท์มือถือ
-- `is_registered` (TINYINT(1), Default 0) - สถานะการลงทะเบียนสมาชิก
-- `password_hash` (VARCHAR(255), Null) - รหัสผ่านที่เข้ารหัส (กรณีสมัครสมาชิก)
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.2 `request_types` (ประเภทคำขอเอกสาร)
-เก็บประเภทเอกสารและแบบรายการเอกสารหลักฐานบังคับที่กำหนดให้แนบ
-- `id` (INT, Primary Key, Auto Increment)
-- `code` (VARCHAR(10), Unique, Not Null) - อักษรย่ออ้างอิง เช่น `HS`, `TR`, `ED`
-- `name_th` (VARCHAR(255), Not Null) - ชื่อภาษาไทยของประเภทคำขอ
-- `doc_checklist` (JSON, Not Null) - อาเรย์เอกสารหลักฐาน เช่น `["สำเนาบัตรประชาชน", "ใบแจ้งความ"]`
-- `active` (TINYINT(1), Default 1) - สถานะเปิด/ปิดใช้งานประเภทนี้
-
-### 1.3 `officers` (เจ้าหน้าที่และสิทธิ์การทำงาน)
-เก็บข้อมูลเจ้าหน้าที่ สพม.นราธิวาส ที่มีสิทธิ์ควบคุมหลังบ้าน
-- `id` (INT, Primary Key, Auto Increment)
-- `username` (VARCHAR(50), Unique, Not Null) - ชื่อเข้าใช้ระบบ
-- `password_hash` (VARCHAR(255), Not Null) - รหัสผ่าน bcrypt hash
-- `name` (VARCHAR(255), Not Null) - ชื่อและนามสกุลเจ้าหน้าที่
-- `email` (VARCHAR(255), Unique, Not Null) - อีเมลติดต่อ
-- `role` (ENUM('staff', 'head', 'admin'), Default 'staff') - ระดับสิทธิ์
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.4 `requests` (รายการคำขอเอกสาร)
-ตารางหลักจัดเก็บคำขอเอกสารแต่ละรายการ
-- `id` (INT, Primary Key, Auto Increment)
-- `request_no` (VARCHAR(50), Unique, Not Null) - รหัสคำขอ เช่น `NWT-HS-2569-000001`
-- `type_id` (INT, Not Null, FK) - ลิงก์กับ `request_types`
-- `applicant_id` (INT, Not Null, FK) - ลิงก์กับ `applicants`
-- `assigned_officer_id` (INT, Null, FK) - เจ้าหน้าที่ผู้รับผิดชอบ ลิงก์กับ `officers`
-- `status` (VARCHAR(50), Default 'submitted') - สถานะปัจจุบัน
-- `form_data` (JSON, Not Null) - คำตอบฟิลด์แบบฟอร์มการศึกษาแบบไดนามิก
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-- `updated_at` (TIMESTAMP, Default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
-
-### 1.5 `attachments` (ไฟล์หลักฐานแนบ)
-เก็บข้อมูลและเส้นทางเก็บไฟล์เอกสาร PDF
-- `id` (INT, Primary Key, Auto Increment)
-- `request_id` (INT, Not Null, FK) - ลิงก์กับ `requests`
-- `file_name` (VARCHAR(255), Not Null) - ชื่อไฟล์เดิมตอนอัปโหลด
-- `file_path` (VARCHAR(512), Not Null) - พาธเก็บไฟล์จริงบนดิสก์
-- `mime_type` (VARCHAR(100), Not Null) - ประเภทไฟล์
-- `file_size` (INT, Not Null) - ขนาดไฟล์เป็นไบต์
-- `uploaded_by` (ENUM('applicant', 'officer'), Not Null) - ผู้อัปโหลด
-- `version` (INT, Default 1) - เวอร์ชันเอกสารหลักฐาน (เพื่อประวัติการส่งใหม่)
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.6 `status_history` (ประวัติความคืบหน้าและการอนุมัติ)
-บันทึกประวัติการเปลี่ยนแปลงสถานะคำขอ (Audit Trail)
-- `id` (INT, Primary Key, Auto Increment)
-- `request_id` (INT, Not Null, FK) - ลิงก์กับ `requests`
-- `from_status` (VARCHAR(50), Not Null) - สถานะก่อนเปลี่ยน
-- `to_status` (VARCHAR(50), Not Null) - สถานะหลังเปลี่ยน
-- `reason` (TEXT, Null) - บันทึกความคิดเห็นของเจ้าหน้าที่/เหตุผลการขอข้อมูลเพิ่ม
-- `officer_id` (INT, Null, FK) - เจ้าหน้าที่ผู้แก้ไข ลิงก์กับ `officers`
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.7 `messages` (บทสนทนาแชทโต้ตอบ)
-ห้องแชทสื่อสารระหว่างผู้ยื่นคำขอกับเจ้าหน้าที่ของระบบ
-- `id` (INT, Primary Key, Auto Increment)
-- `request_id` (INT, Not Null, FK) - ลิงก์กับ `requests`
-- `sender_type` (ENUM('applicant', 'officer'), Not Null) - ผู้ส่ง
-- `body` (TEXT, Not Null) - ข้อความแชท
-- `internal_note` (TINYINT(1), Default 0) - บันทึกภายในของเจ้าหน้าที่ (ประชาชนไม่เห็น)
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.8 `audit_logs` (บันทึกกิจกรรมในระบบ)
-เก็บประวัติการทำงานของประชาชน เจ้าหน้าที่ และระบบอัตโนมัติ
-- `id` (INT, Primary Key, Auto Increment)
-- `user_id` (INT, Null) - ไอดีผู้กระทำ
-- `user_type` (ENUM('applicant', 'officer', 'system'), Default 'system')
-- `action` (VARCHAR(255), Not Null) - การกระทำ
-- `module` (VARCHAR(100), Not Null) - ส่วนงาน
-- `ip_address` (VARCHAR(45), Not Null) - หมายเลขไอพี
-- `user_agent` (VARCHAR(255), Not Null) - เว็บเบราว์เซอร์ที่ใช้
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
-
-### 1.9 `otp_verifications` (การยืนยันรหัส OTP)
-บันทึกข้อมูลเพื่อใช้ตรวจสอบความถูกต้องของรหัสยืนยันตัวตน
-- `id` (INT, Primary Key, Auto Increment)
-- `email` (VARCHAR(255), Not Null)
-- `otp_code` (VARCHAR(10), Not Null)
-- `expired_at` (DATETIME, Not Null)
-- `attempts` (INT, Default 0) - จำนวนครั้งที่พยายามกรอก (จำกัดไม่เกิน 5 ครั้ง)
-- `verified` (TINYINT(1), Default 0) - สถานะการใช้งานแล้ว
-- `created_at` (TIMESTAMP, Default CURRENT_TIMESTAMP)
+โครงสร้างฐานข้อมูลของระบบประยุกต์สำหรับ Homeschool Management Module ประกอบด้วย 23 ตาราง ภายใต้ฐานข้อมูล MySQL/MariaDB โดยใช้ `utf8mb4_unicode_ci`
 
 ---
 
-## 2. ดัชนีการค้นหา (Indexes & Keys)
+## 1. ตารางข้อมูลหลัก (Core Tables)
 
-- **Foreign Keys**:
-  - `requests.type_id` -> `request_types.id` (RESTRICT)
-  - `requests.applicant_id` -> `applicants.id` (CASCADE)
-  - `requests.assigned_officer_id` -> `officers.id` (SET NULL)
-  - `attachments.request_id` -> `requests.id` (CASCADE)
-  - `status_history.request_id` -> `requests.id` (CASCADE)
-  - `status_history.officer_id` -> `officers.id` (SET NULL)
-  - `messages.request_id` -> `requests.id` (CASCADE)
-- **Indexes**:
-  - `requests.idx_status` (คอลัมน์ `status` เพื่อค้นหาเร็วในหน้า Dashboard)
-  - `requests.idx_request_no` (คอลัมน์ `request_no` เพื่อค้นหาเลขคำขอ)
-  - `otp_verifications.idx_email_otp` (คอลัมน์ `email` และ `otp_code` ร่วมกันเพื่อตรวจสอบรหัส)
+### 1.1 `applicants`
+เก็บข้อมูลเบื้องต้นของประชาชนผู้ยื่นคำขอ
+- `id` (INT, PK, AI)
+- `full_name` (VARCHAR(255))
+- `email` (VARCHAR(255), UNIQUE)
+- `phone` (VARCHAR(20))
+- `is_registered` (TINYINT(1))
+- `password_hash` (VARCHAR(255), NULL)
+- `created_at` (TIMESTAMP)
+
+### 1.2 `applicant_accounts`
+เก็บข้อมูลบัญชีและรหัสผ่านเข้าใช้งานแบบคงที่ของประชาชนแต่ละคน
+- `id` (INT, PK, AI)
+- `applicant_id` (INT, FK -> applicants.id)
+- `applicant_code` (VARCHAR(50), UNIQUE) - e.g., HSU-2026-000123
+- `password_hash` (VARCHAR(255))
+- `password_plain` (VARCHAR(50)) - สำหรับให้เจ้าหน้าที่อ่านกรณีแจ้งข้อมูลผู้ใช้ลืมรหัสผ่าน
+- `created_at` (TIMESTAMP)
+
+### 1.3 `requests`
+เก็บคำขอจัดตั้งและประเมินผลการเรียนรู้ของบ้านเรียน
+- `id` (INT, PK, AI)
+- `request_no` (VARCHAR(50), UNIQUE)
+- `type_id` (INT, FK)
+- `applicant_id` (INT, FK)
+- `assigned_officer_id` (INT, FK, NULL)
+- `status` (VARCHAR(50)) - สถานะภาพรวม
+- `process_1_status` (VARCHAR(50)) - ขั้นขออนุมัติจัดตั้ง
+- `process_2_status` (VARCHAR(50)) - ขั้นการวัดประเมินผลสัมฤทธิ์
+- `form_data` (JSON)
+- `created_at` (TIMESTAMP)
+- `updated_at` (TIMESTAMP)
+
+### 1.4 `request_attachments`
+เก็บไฟล์แนบการส่งคำขอและไฟล์ตอบกลับทางเอกสารจากฝ่ายเจ้าหน้าที่
+- `id` (INT, PK, AI)
+- `request_id` (INT, FK)
+- `file_name` (VARCHAR(255))
+- `file_path` (VARCHAR(512))
+- `mime_type` (VARCHAR(100))
+- `file_size` (INT)
+- `uploaded_by` (ENUM('applicant', 'officer'))
+- `attachment_type` (VARCHAR(100)) - completed_form, supporting_document, official_letter, approval_document, notification_letter, other
+- `created_at` (TIMESTAMP)
+
+### 1.5 `staff_messages`
+ข้อความหรือหมายเหตุเตือนจากเจ้าหน้าที่ปฏิบัติงาน
+- `id` (INT, PK, AI)
+- `request_id` (INT, FK)
+- `officer_id` (INT, FK)
+- `message` (TEXT)
+- `created_at` (TIMESTAMP)
+
+### 1.6 `meeting_results`
+บันทึกประวัติการประชุมและตรวจประเมินแผนบ้านเรียนของคณะทำงาน
+- `id` (INT, PK, AI)
+- `request_id` (INT, FK)
+- `meeting_date` (DATE)
+- `result_summary` (TEXT)
+- `file_name` (VARCHAR(255), NULL)
+- `file_path` (VARCHAR(512), NULL)
+- `mime_type` (VARCHAR(100), NULL)
+- `file_size` (INT, NULL)
+- `officer_id` (INT, FK)
+- `created_at` (TIMESTAMP)
+
+### 1.7 `workflow_history`
+บันทึกขั้นตอนและกิจกรรมการปรับปรุงสถานะหรือรายละเอียดคำขอ
+- `id` (INT, PK, AI)
+- `request_id` (INT, FK)
+- `action` (VARCHAR(100))
+- `details` (TEXT)
+- `officer_id` (INT, FK, NULL)
+- `applicant_id` (INT, FK, NULL)
+- `ip_address` (VARCHAR(45))
+- `user_agent` (VARCHAR(255))
+- `created_at` (TIMESTAMP)
+
+---
+
+## 2. ตารางประชาสัมพันธ์และงานเอกสาร (Announcements & Documents)
+
+### 2.1 `announcements`
+ข่าวประชาสัมพันธ์และประกาศแจ้งเตือนหน้าเว็บ
+- `id` (INT, PK, AI)
+- `title` (VARCHAR(255))
+- `content` (TEXT)
+- `type` (VARCHAR(50)) - announcement, public_notice, update
+- `author_id` (INT, FK -> officers.id)
+- `created_at` (TIMESTAMP)
+
+### 2.2 `laws`
+ไฟล์ระเบียบและแนวทางการจัดการศึกษาแบบครอบครัว
+- `id` (INT, PK, AI)
+- `title` (VARCHAR(255))
+- `category` (VARCHAR(100))
+- `file_name` (VARCHAR(255))
+- `file_path` (VARCHAR(512))
+- `file_size` (INT)
+- `uploaded_by` (INT, FK)
+- `created_at` (TIMESTAMP)
+
+### 2.3 `download_documents`
+แบบฟอร์มเปล่าและโครงสร้างเอกสารแม่แบบให้ดาวน์โหลด
+- `id` (INT, PK, AI)
+- `title` (VARCHAR(255))
+- `category` (VARCHAR(100))
+- `file_name` (VARCHAR(255))
+- `file_path` (VARCHAR(512))
+- `file_size` (INT)
+- `uploaded_by` (INT, FK)
+- `created_at` (TIMESTAMP)
+
+### 2.4 `infographics`
+รูปภาพอินโฟกราฟิกประชาสัมพันธ์
+- `id` (INT, PK, AI)
+- `title` (VARCHAR(255))
+- `image_name` (VARCHAR(255))
+- `image_path` (VARCHAR(512))
+- `uploaded_by` (INT, FK)
+- `created_at` (TIMESTAMP)

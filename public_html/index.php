@@ -120,6 +120,26 @@ try {
         $controller = new \App\Controllers\RoleController();
         $controller->create();
         
+    // Announcements Management Routes
+    } elseif ($route === 'admin/announcements') {
+        $controller = new \App\Controllers\AnnouncementsAdminController();
+        $controller->index();
+
+    // Laws Management Routes
+    } elseif ($route === 'admin/laws') {
+        $controller = new \App\Controllers\LawsAdminController();
+        $controller->index();
+
+    // Downloads Management Routes
+    } elseif ($route === 'admin/downloads') {
+        $controller = new \App\Controllers\DownloadsAdminController();
+        $controller->index();
+
+    // Infographics Management Routes
+    } elseif ($route === 'admin/infographics') {
+        $controller = new \App\Controllers\InfographicsAdminController();
+        $controller->index();
+        
     // API Route delegation
     } elseif ($route === 'api/requests') {
         require_once __DIR__ . '/api/requests.php';

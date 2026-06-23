@@ -9,10 +9,17 @@ class CsrfMiddleware {
         if (session_status() === PHP_SESSION_NONE) {
             // Set secure cookies if connection is secure
             $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
+            $domain = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '';
+            
+            // Fix Chrome/browsers rejecting cookies on 'localhost' or local domain when explicitly set
+            if ($domain === 'localhost' || strpos($domain, '.') === false) {
+                $domain = '';
+            }
+
             session_set_cookie_params([
                 'lifetime' => 0,
                 'path' => '/',
-                'domain' => isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '',
+                'domain' => $domain,
                 'secure' => $secure,
                 'httponly' => true,
                 'samesite' => 'Lax'

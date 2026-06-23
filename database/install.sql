@@ -21,11 +21,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ============================================================
 -- 1. DATABASE CREATION
 -- ============================================================
-CREATE DATABASE IF NOT EXISTS `edocs_spmnara`
+CREATE DATABASE IF NOT EXISTS `sesaonara_edocs`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `edocs_spmnara`;
+USE `sesaonara_edocs`;
 
 -- ============================================================
 -- 2. TABLE CREATION
@@ -130,6 +130,8 @@ CREATE TABLE IF NOT EXISTS `requests` (
     `applicant_id`        INT          NOT NULL,
     `assigned_officer_id` INT          NULL,
     `status`              VARCHAR(50)  NOT NULL DEFAULT 'submitted',
+    `process_1_status`    VARCHAR(50)  NOT NULL DEFAULT 'submitted',
+    `process_2_status`    VARCHAR(50)  NOT NULL DEFAULT 'not_started',
     `form_data`           JSON         NOT NULL,
     `created_at`          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     `updated_at`          TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -200,6 +202,123 @@ CREATE TABLE IF NOT EXISTS `otp_verifications` (
     `verified`   TINYINT(1)   DEFAULT 0,
     `created_at` TIMESTAMP    DEFAULT CURRENT_TIMESTAMP,
     INDEX `idx_email_otp` (`email`, `otp_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 15: announcements (ข่าวประชาสัมพันธ์และประกาศ)
+CREATE TABLE IF NOT EXISTS `announcements` (
+    `id`         INT AUTO_INCREMENT PRIMARY KEY,
+    `title`      VARCHAR(255) NOT NULL,
+    `content`    TEXT NOT NULL,
+    `type`       VARCHAR(50) NOT NULL, -- 'announcement', 'public_notice', 'update'
+    `author_id`  INT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_announcements_author` FOREIGN KEY (`author_id`) REFERENCES `officers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 16: laws (กฎหมายและระเบียบที่เกี่ยวข้อง)
+CREATE TABLE IF NOT EXISTS `laws` (
+    `id`          INT AUTO_INCREMENT PRIMARY KEY,
+    `title`       VARCHAR(255) NOT NULL,
+    `category`    VARCHAR(100) NOT NULL, -- 'PDF laws', 'ministerial regulations', 'official guidelines', 'related regulations'
+    `file_name`   VARCHAR(255) NOT NULL,
+    `file_path`   VARCHAR(512) NOT NULL,
+    `file_size`   INT NOT NULL,
+    `uploaded_by` INT NULL,
+    `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_laws_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `officers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 17: download_documents (ศูนย์ดาวน์โหลดแบบฟอร์ม)
+CREATE TABLE IF NOT EXISTS `download_documents` (
+    `id`          INT AUTO_INCREMENT PRIMARY KEY,
+    `title`       VARCHAR(255) NOT NULL,
+    `category`    VARCHAR(100) NOT NULL, -- 'Homeschool Application', 'Education Plan Templates', 'Learning Report Templates', 'Transfer Requests', 'Graduation Requests', 'Other Documents'
+    `file_name`   VARCHAR(255) NOT NULL,
+    `file_path`   VARCHAR(512) NOT NULL,
+    `file_size`   INT NOT NULL,
+    `uploaded_by` INT NULL,
+    `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_download_documents_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `officers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 18: infographics (อินโฟกราฟิกและแบนเนอร์)
+CREATE TABLE IF NOT EXISTS `infographics` (
+    `id`          INT AUTO_INCREMENT PRIMARY KEY,
+    `title`       VARCHAR(255) NOT NULL,
+    `image_name`  VARCHAR(255) NOT NULL,
+    `image_path`  VARCHAR(512) NOT NULL,
+    `uploaded_by` INT NULL,
+    `created_at`  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_infographics_uploader` FOREIGN KEY (`uploaded_by`) REFERENCES `officers` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 19: applicant_accounts (บัญชีผู้ยื่นคำขอ)
+CREATE TABLE IF NOT EXISTS `applicant_accounts` (
+    `id`             INT AUTO_INCREMENT PRIMARY KEY,
+    `applicant_id`   INT NOT NULL UNIQUE,
+    `applicant_code` VARCHAR(50) NOT NULL UNIQUE,
+    `password_hash`  VARCHAR(255) NOT NULL,
+    `password_plain` VARCHAR(50) NOT NULL,
+    `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_applicant_accounts_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 20: staff_messages (บันทึกข้อความจากเจ้าหน้าที่)
+CREATE TABLE IF NOT EXISTS `staff_messages` (
+    `id`         INT AUTO_INCREMENT PRIMARY KEY,
+    `request_id` INT NOT NULL,
+    `officer_id` INT NOT NULL,
+    `message`    TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_staff_messages_request` FOREIGN KEY (`request_id`) REFERENCES `requests` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_staff_messages_officer` FOREIGN KEY (`officer_id`) REFERENCES `officers` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 21: request_attachments (เอกสารประกอบคำขอและการตอบกลับ)
+CREATE TABLE IF NOT EXISTS `request_attachments` (
+    `id`              INT AUTO_INCREMENT PRIMARY KEY,
+    `request_id`      INT NOT NULL,
+    `file_name`       VARCHAR(255) NOT NULL,
+    `file_path`       VARCHAR(512) NOT NULL,
+    `mime_type`       VARCHAR(100) NOT NULL,
+    `file_size`       INT NOT NULL,
+    `uploaded_by`     ENUM('applicant','officer') NOT NULL,
+    `attachment_type` VARCHAR(100) NOT NULL, -- 'completed_form', 'supporting_document', 'official_letter', 'approval_document', 'notification_letter', 'other'
+    `created_at`      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_request_attachments_request` FOREIGN KEY (`request_id`) REFERENCES `requests` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 22: meeting_results (ผลการประชุมคณะทำงาน)
+CREATE TABLE IF NOT EXISTS `meeting_results` (
+    `id`             INT AUTO_INCREMENT PRIMARY KEY,
+    `request_id`     INT NOT NULL,
+    `meeting_date`   DATE NOT NULL,
+    `result_summary` TEXT NOT NULL,
+    `file_name`      VARCHAR(255) NULL,
+    `file_path`      VARCHAR(512) NULL,
+    `mime_type`      VARCHAR(100) NULL,
+    `file_size`      INT NULL,
+    `officer_id`     INT NOT NULL,
+    `created_at`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_meeting_results_request` FOREIGN KEY (`request_id`) REFERENCES `requests` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_meeting_results_officer` FOREIGN KEY (`officer_id`) REFERENCES `officers` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 23: workflow_history (บันทึกขั้นตอนและกิจกรรมการทำงาน)
+CREATE TABLE IF NOT EXISTS `workflow_history` (
+    `id`           INT AUTO_INCREMENT PRIMARY KEY,
+    `request_id`   INT NOT NULL,
+    `action`       VARCHAR(100) NOT NULL,
+    `details`      TEXT NOT NULL,
+    `officer_id`   INT NULL,
+    `applicant_id` INT NULL,
+    `ip_address`   VARCHAR(45) NOT NULL,
+    `user_agent`   VARCHAR(255) NOT NULL,
+    `created_at`   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `fk_workflow_history_request` FOREIGN KEY (`request_id`) REFERENCES `requests` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_workflow_history_officer` FOREIGN KEY (`officer_id`) REFERENCES `officers` (`id`) ON DELETE SET NULL,
+    CONSTRAINT `fk_workflow_history_applicant` FOREIGN KEY (`applicant_id`) REFERENCES `applicants` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
@@ -289,13 +408,16 @@ INSERT IGNORE INTO `request_types` (`code`, `name_th`, `doc_checklist`, `active`
     1, 2),
 ('ED', 'ขอหนังสือรับรองวุฒิการศึกษาเพื่อศึกษาต่อ (Education Verification)',
     '["สำเนาบัตรประจำตัวประชาชน","หนังสือแจ้งความจำนงจากหน่วยงานที่เกี่ยวข้อง"]',
-    1, 3);
+    1, 3),
+('HMS', 'ขออนุญาตจัดการศึกษาขั้นพื้นฐานโดยครอบครัว (Homeschool Management)',
+    '["แบบคำขอจัดการศึกษา (Completed Form)","แผนการจัดการศึกษา (Education Plan)","สำเนาบัตรประจำตัวประชาชนผู้ปกครอง","สำเนาทะเบียนบ้านผู้ปกครองและผู้เรียน","หลักฐานแสดงวุฒิการศึกษาของผู้ปกครอง"]',
+    1, 4);
 
 -- Seed: Default Officer Accounts (เจ้าหน้าที่จำลองในระบบ)
 -- Password for all accounts: admin123 (Encrypted using Bcrypt)
 INSERT IGNORE INTO `officers` (`username`, `password_hash`, `name`, `email`, `role`) VALUES
-('admin', '$2y$10$gP7B.EwKfe9g5W3.mXg.eO.t.wUjXbCtf70Nsp8kR4hH976H2mFxe', 'ผู้ดูแลระบบ สพม.นราธิวาส',     'admin@spmnara.go.th', 'admin'),
-('head',  '$2y$10$gP7B.EwKfe9g5W3.mXg.eO.t.wUjXbCtf70Nsp8kR4hH976H2mFxe', 'หัวหน้ากลุ่ม สพม.นราธิวาส',   'head@spmnara.go.th',  'head'),
-('staff', '$2y$10$gP7B.EwKfe9g5W3.mXg.eO.t.wUjXbCtf70Nsp8kR4hH976H2mFxe', 'เจ้าหน้าที่ สพม.นราธิวาส',    'staff@spmnara.go.th', 'staff');
+('admin', '$2y$10$hR9eEDlmu8iIzBeB75y.funu03kNfw.f1h82yVOCNW7p/3Tvo.lwG', 'ผู้ดูแลระบบ สพม.นราธิวาส',     'admin@spmnara.go.th', 'admin'),
+('head',  '$2y$10$hR9eEDlmu8iIzBeB75y.funu03kNfw.f1h82yVOCNW7p/3Tvo.lwG', 'หัวหน้ากลุ่ม สพม.นราธิวาส',   'head@spmnara.go.th',  'head'),
+('staff', '$2y$10$hR9eEDlmu8iIzBeB75y.funu03kNfw.f1h82yVOCNW7p/3Tvo.lwG', 'เจ้าหน้าที่ สพม.นราธิวาส',    'staff@spmnara.go.th', 'staff');
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -192,7 +192,7 @@
                         <!-- 1. Change Status Card -->
                         <div class="card card-premium shadow-sm mb-4 border-warning border-top border-3">
                             <div class="card-header bg-white py-3">
-                                <h5 class="fw-bold mb-0 text-warning"><i class="fa-solid fa-list-check me-2"></i>จัดการผลตรวจสอบ</h5>
+                                <h5 class="fw-bold mb-0 text-warning"><i class="fa-solid fa-list-check me-2"></i>จัดการผลตรวจสอบภาพรวม</h5>
                             </div>
                             <div class="card-body p-3">
                                 <form action="" method="POST" class="needs-validation" novalidate>
@@ -218,7 +218,7 @@
 
                                     <div class="mb-3">
                                         <label for="reason" class="form-label small fw-bold">เหตุผล/คำชี้แจง (ส่งไปยังผู้ยื่นคำขอ) <span class="text-danger" id="reason-required" style="display: none;">*</span></label>
-                                        <textarea class="form-control form-control-sm" id="reason" name="reason" rows="4" 
+                                        <textarea class="form-control form-control-sm" id="reason" name="reason" rows="3" 
                                                   placeholder="รายละเอียดคำชี้แจงแก้ไขเอกสาร หรือปฏิเสธคำขอ"></textarea>
                                         <div class="form-text text-muted small">หากเลือกต้องการแก้ไขเอกสาร (need_info) หรือปฏิเสธคำขอ (rejected) ต้องกรอกข้อมูลส่วนนี้</div>
                                     </div>
@@ -230,9 +230,206 @@
                             </div>
                         </div>
 
-                        <!-- 2. Assign Officer Card -->
+                        <!-- 2. Workflow Tools Accordion Card -->
+                        <div class="card card-premium shadow-sm mb-4 border-info border-top border-3">
+                            <div class="card-header bg-white py-3">
+                                <h5 class="fw-bold mb-0 text-info"><i class="fa-solid fa-sliders me-2"></i>เครื่องมือประมวลผลจัดตั้ง</h5>
+                            </div>
+                            <div class="card-body p-2">
+                                <div class="accordion accordion-flush" id="workflowAccordion">
+                                    
+                                    <!-- Accordion Item 1: Process 1 -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP1">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP1" aria-expanded="false" aria-controls="collapseP1">
+                                                <i class="fa-solid fa-file-signature text-warning me-2"></i> 1. ผลพิจารณาอนุญาต
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP1" class="accordion-collapse collapse" aria-labelledby="headingP1" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-2 bg-light">
+                                                <form action="" method="POST" class="needs-validation" novalidate>
+                                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                                    <input type="hidden" name="action" value="change_process_1">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small fw-bold">สถานะกระบวนการที่ 1</label>
+                                                        <select class="form-select form-select-sm" name="process_1_status" required>
+                                                            <option value="submitted" <?= ($request['process_1_status'] ?? 'submitted') === 'submitted' ? 'selected' : '' ?>>ยื่นคำขอแล้ว</option>
+                                                            <option value="in_review" <?= ($request['process_1_status'] ?? '') === 'in_review' ? 'selected' : '' ?>>อยู่ระหว่างพิจารณา</option>
+                                                            <option value="approved" <?= ($request['process_1_status'] ?? '') === 'approved' ? 'selected' : '' ?>>อนุมัติจัดตั้งสำเร็จ</option>
+                                                            <option value="rejected" <?= ($request['process_1_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ปฏิเสธการจัดตั้ง</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small fw-bold">ข้อความ/คำชี้แจง</label>
+                                                        <textarea class="form-control form-control-sm" name="reason" rows="2" placeholder="ใส่รายละเอียดแจ้งผู้สมัคร..."></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2 small text-start">
+                                                        <input class="form-check-input" type="checkbox" role="switch" name="send_email" value="1" id="send_email_p1" checked>
+                                                        <label class="form-check-label text-muted" for="send_email_p1" style="font-size:0.75rem;">ส่งอีเมลแจ้งเตือนผู้สมัคร</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning text-dark w-100 fw-bold btn-sm py-1.5"><i class="fa-solid fa-floppy-disk me-1"></i>บันทึกกระบวนการ 1</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Item 2: Process 2 -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP2">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP2" aria-expanded="false" aria-controls="collapseP2">
+                                                <i class="fa-solid fa-award text-success me-2"></i> 2. ผลประเมินสัมฤทธิผล
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP2" class="accordion-collapse collapse" aria-labelledby="headingP2" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-2 bg-light">
+                                                <form action="" method="POST" class="needs-validation" novalidate>
+                                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                                    <input type="hidden" name="action" value="change_process_2">
+                                                    <div class="mb-2">
+                                                        <label class="form-label small fw-bold">สถานะกระบวนการที่ 2</label>
+                                                        <select class="form-select form-select-sm" name="process_2_status" required>
+                                                            <option value="not_started" <?= ($request['process_2_status'] ?? 'not_started') === 'not_started' ? 'selected' : '' ?>>ยังไม่เริ่มดำเนินการ</option>
+                                                            <option value="in_review" <?= ($request['process_2_status'] ?? '') === 'in_review' ? 'selected' : '' ?>>อยู่ระหว่างการประเมิน</option>
+                                                            <option value="completed" <?= ($request['process_2_status'] ?? '') === 'completed' ? 'selected' : '' ?>>ประเมินสำเร็จ & อนุมัติจบ</option>
+                                                            <option value="rejected" <?= ($request['process_2_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ไม่ผ่านเกณฑ์ประเมิน</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <label class="form-label small fw-bold">ข้อความ/คำชี้แจง</label>
+                                                        <textarea class="form-control form-control-sm" name="reason" rows="2" placeholder="ใส่รายละเอียดแจ้งผู้สมัคร..."></textarea>
+                                                    </div>
+                                                    <div class="form-check form-switch mb-2 small text-start">
+                                                        <input class="form-check-input" type="checkbox" role="switch" name="send_email" value="1" id="send_email_p2" checked>
+                                                        <label class="form-check-label text-muted" for="send_email_p2" style="font-size:0.75rem;">ส่งอีเมลแจ้งเตือนผู้สมัคร</label>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-warning text-dark w-100 fw-bold btn-sm py-1.5"><i class="fa-solid fa-floppy-disk me-1"></i>บันทึกกระบวนการ 2</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Item 3: Official Doc Upload -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP3">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP3" aria-expanded="false" aria-controls="collapseP3">
+                                                <i class="fa-solid fa-file-pdf text-danger me-2"></i> 3. ส่งหนังสือราชการตอบกลับ
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP3" class="accordion-collapse collapse" aria-labelledby="headingP3" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-2 bg-light">
+                                                <form action="" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                                    <input type="hidden" name="action" value="upload_official_doc">
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">ประเภทเอกสาร</label>
+                                                        <select class="form-select form-select-sm" name="attachment_type" required>
+                                                            <option value="official_letter">หนังสือแจ้งทางการ</option>
+                                                            <option value="approval_document">ใบอนุญาตจัดตั้ง/ตราสาร</option>
+                                                            <option value="notification_letter">หนังสือแจ้งผลประเมินสัมฤทธิ์</option>
+                                                            <option value="other">เอกสารตอบกลับอื่นๆ</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">เลือกไฟล์ PDF <span class="text-danger">*</span></label>
+                                                        <input type="file" name="official_file" accept="application/pdf" class="form-control form-control-sm" required>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-teal text-white w-100 fw-bold btn-sm py-1.5"><i class="fa-solid fa-cloud-arrow-up me-1"></i>อัปโหลดจัดส่งไฟล์</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Item 4: Log Meeting -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP4">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP4" aria-expanded="false" aria-controls="collapseP4">
+                                                <i class="fa-solid fa-users text-teal me-2"></i> 4. มติการประชุมคณะอนุกรรมการ
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP4" class="accordion-collapse collapse" aria-labelledby="headingP4" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-2 bg-light">
+                                                <form action="" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                                    <input type="hidden" name="action" value="log_meeting">
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">วันที่จัดการประชุม <span class="text-danger">*</span></label>
+                                                        <input type="date" name="meeting_date" class="form-control form-control-sm" required>
+                                                    </div>
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">สรุปผลมติการประชุม <span class="text-danger">*</span></label>
+                                                        <textarea class="form-control form-control-sm" name="result_summary" rows="3" required placeholder="มติอนุมัติ/ข้อเสนอแนะในการประเมินความเห็นชอบ..."></textarea>
+                                                    </div>
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">รายงานมติ/หนังสือสั่งการ (PDF)</label>
+                                                        <input type="file" name="meeting_file" accept="application/pdf" class="form-control form-control-sm">
+                                                    </div>
+                                                    <button type="submit" class="btn btn-secondary w-100 fw-bold btn-sm py-1.5"><i class="fa-solid fa-square-check me-1"></i>บันทึกผลประชุม</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Item 5: Notify Applicant -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP5">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP5" aria-expanded="false" aria-controls="collapseP5">
+                                                <i class="fa-solid fa-paper-plane text-info me-2"></i> 5. ประกาศจดหมายข่าวสารชี้แจง
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP5" class="accordion-collapse collapse" aria-labelledby="headingP5" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-2 bg-light">
+                                                <form action="" method="POST" class="needs-validation" novalidate>
+                                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                                    <input type="hidden" name="action" value="notify_applicant">
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">หัวข้ออีเมล <span class="text-danger">*</span></label>
+                                                        <input type="text" name="subject" class="form-control form-control-sm" required placeholder="เรื่องผลการพิจารณาตรวจสอบ...">
+                                                    </div>
+                                                    <div class="mb-2 text-start">
+                                                        <label class="form-label small fw-bold">เนื้อความจดหมาย <span class="text-danger">*</span></label>
+                                                        <textarea class="form-control form-control-sm" name="body" rows="3" required placeholder="พิมพ์รายละเอียดที่ต้องการจัดแจ้งให้แก่ผู้ปกครองโดยตรง..."></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-info text-white w-100 fw-bold btn-sm py-1.5"><i class="fa-solid fa-paper-plane me-1"></i>ส่งอีเมลชี้แจง</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Accordion Item 6: Password Recovery -->
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header" id="headingP6">
+                                            <button class="accordion-button collapsed py-2 px-3 fw-bold small" type="button" data-bs-toggle="collapse" data-bs-target="#collapseP6" aria-expanded="false" aria-controls="collapseP6">
+                                                <i class="fa-solid fa-key text-danger me-2"></i> 6. กู้คืนรหัสผ่านผู้ยื่นคำขอ
+                                            </button>
+                                        </h2>
+                                        <div id="collapseP6" class="accordion-collapse collapse" aria-labelledby="headingP6" data-bs-parent="#workflowAccordion">
+                                            <div class="accordion-body p-3 bg-light text-start">
+                                                <span class="text-danger fw-bold small d-block mb-1"><i class="fa-solid fa-circle-exclamation me-1"></i> ข้อมูลใช้ช่วยกู้คืนรหัสสำหรับฝ่ายผู้ยื่นคำขอ</span>
+                                                
+                                                <span class="text-muted small d-block">รหัสเข้าใช้งาน (Code):</span>
+                                                <strong class="text-primary d-block mb-2 text-break" style="font-size: 0.85rem; font-family: monospace;">
+                                                    <?= esc($applicantAccount['applicant_code'] ?? 'ไม่มีข้อมูลบัญชีผู้ยื่น') ?>
+                                                </strong>
+                                                
+                                                <span class="text-muted small d-block">รหัสผ่านชั่วคราว (Plain):</span>
+                                                <strong class="text-dark d-block mb-2 text-center bg-white border border-secondary border-opacity-25 rounded py-1.5" style="font-size: 1.15rem; font-family: monospace; letter-spacing: 1px;">
+                                                    <?= esc($applicantAccount['password_plain'] ?? 'ไม่มีข้อมูลรหัสผ่าน') ?>
+                                                </strong>
+                                                
+                                                <p class="text-secondary mb-0 small" style="font-size: 0.7rem; line-height: 1.4;">
+                                                    <i class="fa-solid fa-info-circle me-1 text-teal"></i> หากประชาชนผู้ยื่นคำขอลืมรหัสผ่าน ให้เข้าตรวจสอบและคัดลอกข้อมูลรหัสผ่านชุดนี้แจ้งให้ผู้รับบริการทราบโดยตรง
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Assign Officer Card -->
                         <?php if (in_array($_SESSION['officer_role'], ['admin', 'head'])): ?>
-                            <div class="card card-premium shadow-sm border-primary border-top border-3">
+                            <div class="card card-premium shadow-sm border-primary border-top border-3 mb-4">
                                 <div class="card-header bg-white py-3">
                                     <h5 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-user-tag me-2"></i> มอบหมายผู้ดูแลคิว</h5>
                                 </div>

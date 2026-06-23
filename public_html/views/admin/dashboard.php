@@ -71,6 +71,21 @@
                             <i class="fa-solid fa-user-lock me-2"></i> Roles & สิทธิ์
                         </a>
                         <?php endif; ?>
+
+                        <hr class="my-1 border-secondary opacity-25">
+                        <span class="text-muted small px-3 mb-1 d-block fw-bold text-teal"><i class="fa-solid fa-sliders me-1"></i> จัดการเนื้อหาหน้าเว็บหลัก</span>
+                        <a href="<?= \App\Config\Config::SITE_URL ?>/admin/announcements" class="admin-sidebar-link">
+                            <i class="fa-solid fa-bullhorn me-2"></i> จัดการประกาศ & ข่าวสาร
+                        </a>
+                        <a href="<?= \App\Config\Config::SITE_URL ?>/admin/laws" class="admin-sidebar-link">
+                            <i class="fa-solid fa-scale-balanced me-2"></i> จัดการกฎหมาย & ระเบียบ
+                        </a>
+                        <a href="<?= \App\Config\Config::SITE_URL ?>/admin/downloads" class="admin-sidebar-link">
+                            <i class="fa-solid fa-download me-2"></i> จัดการแบบฟอร์มเอกสาร
+                        </a>
+                        <a href="<?= \App\Config\Config::SITE_URL ?>/admin/infographics" class="admin-sidebar-link">
+                            <i class="fa-solid fa-image me-2"></i> จัดการภาพสไลด์แบนเนอร์
+                        </a>
                     </nav>
                 </div>
 

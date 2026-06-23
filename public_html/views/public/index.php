@@ -3,13 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบยื่นคำขอเอกสารออนไลน์ | สพม.นราธิวาส</title>
+    <title>ศูนย์บริการข้อมูลและจัดการระบบบ้านเรียนออนไลน์ | สพม.นราธิวาส</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Custom Style -->
     <link href="<?= \App\Config\Config::SITE_URL ?>/assets/css/style.css" rel="stylesheet">
+    <style>
+        .news-card {
+            border-left: 4px solid #0d9488;
+            transition: all 0.2s ease;
+        }
+        .news-card:hover {
+            transform: translateY(-2px);
+        }
+        .category-header {
+            background-color: #f0fdfa;
+            color: #0f766e;
+            font-weight: bold;
+            border-left: 4px solid #0d9488;
+        }
+        .law-item, .doc-item {
+            transition: background-color 0.2s;
+        }
+        .law-item:hover, .doc-item:hover {
+            background-color: #f3f4f6;
+        }
+        .pdpa-box {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #f8fafc;
+        }
+    </style>
 </head>
 <body>
 
@@ -17,9 +42,9 @@
     <nav class="navbar navbar-expand-lg navbar-light navbar-custom py-3">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center" href="<?= \App\Config\Config::SITE_URL ?>">
-                <div class="logo-vector me-3">NWT</div>
+                <div class="logo-vector me-3">HSM</div>
                 <div>
-                    <span class="brand-text">ระบบยื่นเอกสารออนไลน์</span>
+                    <span class="brand-text">ระบบบ้านเรียนออนไลน์</span>
                     <span class="brand-subtitle">สพม.นราธิวาส</span>
                 </div>
             </a>
@@ -29,136 +54,231 @@
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-2">
                     <li class="nav-item"><a class="nav-link active" href="<?= \App\Config\Config::SITE_URL ?>">หน้าแรก</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#request-types">ประเภทคำขอ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#how-to-submit">ขั้นตอนการยื่น</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#contact">ติดต่อ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#announcements-section">ประกาศข่าว</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#laws-section">กฎหมาย & ระเบียบ</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#downloads-section">ศูนย์ดาวน์โหลด</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pdpa-section">นโยบาย PDPA</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#request-types">ยื่นคำขอ</a></li>
                 </ul>
                 <div class="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 mt-3 mt-lg-0">
                     <a href="<?= \App\Config\Config::SITE_URL ?>/request/track" class="btn btn-outline-light btn-sm px-3 py-2 rounded-3 text-center">
                         <i class="fa-solid fa-magnifying-glass me-2"></i>ติดตามคำขอ
                     </a>
                     <a href="<?= \App\Config\Config::SITE_URL ?>/admin/login" class="btn btn-warning btn-sm px-3 py-2 rounded-pill text-dark fw-bold shadow-sm text-center">
-                        <i class="fa-solid fa-right-to-bracket me-2"></i>เข้าสู่ระบบ
+                        <i class="fa-solid fa-right-to-bracket me-2"></i>เข้าสู่ระบบเจ้าหน้าที่
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero-gradient py-5 text-dark position-relative overflow-hidden">
-        <!-- Floating shapes background pattern -->
-        <div class="position-absolute top-0 start-0 w-100 h-100 opacity-10" style="background-image: radial-gradient(circle, #0d9488 1px, transparent 1px); background-size: 20px 20px;"></div>
-        
-        <div class="container py-4 position-relative z-2">
-            <div class="row align-items-center g-5">
-                <!-- Left Column -->
-                <div class="col-lg-7 text-start">
-                    <div class="badge-online-service mb-3 d-inline-flex align-items-center px-3 py-2 rounded-pill shadow-sm">
-                        <i class="fa-regular fa-clock text-warning me-2 animate-spin-slow"></i>
-                        <span class="text-secondary fs-7 fw-semibold">บริการออนไลน์ ตลอด 24 ชั่วโมง</span>
-                    </div>
-                    
-                    <h1 class="display-4 fw-bold mb-3 lh-sm text-dark-green">
-                        ยื่นคำขอการจัด<br>การศึกษา <span class="text-gradient">ออนไลน์</span>
-                    </h1>
-                    
-                    <p class="lead mb-4 text-muted fs-5">
-                        ยื่นคำขอเกี่ยวกับการจัดการศึกษาถึงเจ้าหน้าที่ สพม.นราธิวาส แนบเอกสาร PDF ยืนยันตัวตนด้วย OTP และติดตามสถานะได้ทุกที่ทุกเวลา
-                    </p>
-                    
-                    <div class="d-flex flex-wrap gap-3">
-                        <a href="#request-types" class="btn btn-warning btn-lg px-4 py-3 fw-bold text-dark rounded-3 shadow d-flex align-items-center btn-graphite-action">
-                            <span>เริ่มยื่นคำขอ</span>
-                            <i class="fa-solid fa-arrow-right ms-2 fs-5"></i>
-                        </a>
-                        <a href="<?= \App\Config\Config::SITE_URL ?>/request/track" class="btn btn-outline-light btn-lg px-4 py-3 rounded-3 shadow btn-graphite-action">
-                            <i class="fa-solid fa-magnifying-glass me-2"></i> ติดตามคำขอ
-                        </a>
-                    </div>
+    <!-- Infographics Slider/Gallery Section -->
+    <section class="container mt-4">
+        <?php if (!empty($infographics)): ?>
+            <div id="infographicCarousel" class="carousel slide shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <?php foreach ($infographics as $index => $info): ?>
+                        <button type="button" data-bs-target="#infographicCarousel" data-bs-slide-to="<?= $index ?>" class="<?= $index === 0 ? 'active' : '' ?>" aria-current="<?= $index === 0 ? 'true' : 'false' ?>"></button>
+                    <?php endforeach; ?>
                 </div>
-                
-                <!-- Right Column -->
-                <div class="col-lg-5 text-center position-relative">
-                    <div class="position-relative d-inline-block">
-                        <img src="<?= \App\Config\Config::SITE_URL ?>/assets/images/hero_education.png" 
-                             alt="ระบบยื่นเอกสารออนไลน์ สพม.นราธิวาส" 
-                             class="img-fluid rounded-4 shadow-lg border main-hero-img"
-                             style="max-height: 380px; width: 100%; object-fit: cover;">
-                        
-                        <!-- Floating Glassmorphism Badge -->
-                        <div class="glass-premium-card p-3 rounded-3 shadow-md position-absolute text-start border" 
-                             style="bottom: -15px; left: -15px; max-width: 290px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
-                            <div class="d-flex align-items-center gap-3">
-                                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; min-width: 40px;">
-                                    <i class="fa-solid fa-graduation-cap text-dark fs-5"></i>
+                <div class="carousel-inner">
+                    <?php foreach ($infographics as $index => $info): ?>
+                        <div class="carousel-item <?= $index === 0 ? 'active' : '' ?>" data-bs-interval="5000">
+                            <img src="<?= \App\Config\Config::SITE_URL ?>/<?= esc($info['image_path']) ?>" class="d-block w-100" alt="<?= esc($info['title']) ?>" style="height: 380px; object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block" style="background: rgba(0,0,0,0.5); border-radius: 8px; padding: 10px 20px;">
+                                <h5 class="fw-bold mb-0 text-white"><?= esc($info['title']) ?></h5>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#infographicCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#infographicCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        <?php else: ?>
+            <div class="hero-gradient py-5 text-dark rounded-4 shadow-sm position-relative overflow-hidden">
+                <div class="container py-4 text-center">
+                    <h2 class="fw-bold text-dark-green mb-3">ระบบบริหารจัดการการศึกษาขั้นพื้นฐานโดยครอบครัว</h2>
+                    <p class="lead text-muted max-w-2xl mx-auto">ยินดีต้อนรับสู่ระบบยื่นคำขอจัดตั้งบ้านเรียน (Homeschool) และรายงานผลประเมินสัมฤทธิ์ สพม.นราธิวาส แบบครบวงจรผ่านช่องทางออนไลน์ตลอด 24 ชั่วโมง</p>
+                    <a href="#request-types" class="btn btn-warning px-4 py-2 fw-bold rounded-3 mt-2">เริ่มต้นยื่นคำขอที่นี่</a>
+                </div>
+            </div>
+        <?php endif; ?>
+    </section>
+
+    <!-- News & Announcements Section -->
+    <section class="container py-5" id="announcements-section">
+        <div class="d-flex align-items-center gap-2 mb-4 border-bottom pb-2">
+            <i class="fa-solid fa-bullhorn text-teal fs-4"></i>
+            <h3 class="fw-bold text-dark-green m-0">ข่าวสารประชาสัมพันธ์ & ประกาศ</h3>
+        </div>
+        
+        <div class="row g-4">
+            <?php if (!empty($announcements)): ?>
+                <?php foreach ($announcements as $item): ?>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm border-0 news-card">
+                            <div class="card-body p-4 d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-teal text-white small px-2.5 py-1">
+                                        <?php 
+                                            if ($item['type'] === 'announcement') echo 'ประกาศราชการ';
+                                            elseif ($item['type'] === 'public_notice') echo 'แจ้งประชาสัมพันธ์';
+                                            else echo 'อัปเดตระบบ';
+                                        ?>
+                                    </span>
+                                    <span class="text-muted small"><i class="fa-regular fa-calendar me-1"></i><?= date('d/m/Y', strtotime($item['created_at'])) ?></span>
                                 </div>
-                                <div>
-                                    <h6 class="text-dark fw-bold mb-0 small">สพม.นราธิวาส</h6>
-                                    <p class="text-muted mb-0" style="font-size: 0.7rem;">การศึกษาโดยครอบครัว / อัธยาศัย / ทางเลือก</p>
+                                <h5 class="fw-bold text-dark-green mb-2"><?= esc($item['title']) ?></h5>
+                                <p class="text-muted small flex-grow-1"><?= nl2br(esc(mb_substr($item['content'], 0, 150) . (mb_strlen($item['content']) > 150 ? '...' : ''))) ?></p>
+                                <?php if (mb_strlen($item['content']) > 150): ?>
+                                    <button class="btn btn-link btn-sm text-teal fw-bold p-0 text-start mt-2" data-bs-toggle="modal" data-bs-target="#announceModal<?= $item['id'] ?>">อ่านเพิ่มเติม...</button>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Announcement Modal -->
+                    <div class="modal fade" id="announceModal<?= $item['id'] ?>" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 rounded-4 shadow">
+                                <div class="modal-header bg-teal text-white border-0 py-3">
+                                    <h5 class="modal-title fw-bold text-white"><?= esc($item['title']) ?></h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body p-4">
+                                    <p class="text-muted small mb-3"><i class="fa-regular fa-calendar me-1"></i>เขียนเมื่อวันที่ <?= date('d/m/Y H:i', strtotime($item['created_at'])) ?></p>
+                                    <p class="text-dark" style="line-height: 1.7;"><?= nl2br(esc($item['content'])) ?></p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">ไม่มีประกาศข่าวประชาสัมพันธ์ในขณะนี้</p>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </section>
 
-    <!-- Floating Submenu Bar -->
-    <div class="container position-relative" style="margin-top: -35px; z-index: 10;">
-        <div class="bg-white rounded-4 shadow-lg p-3 border border-light">
-            <div class="row text-center g-2 justify-content-center">
-                <div class="col-6 col-sm-4 col-md-2-custom">
-                    <a href="#request-types" class="submenu-item d-flex flex-column align-items-center justify-content-center p-3 rounded-3 text-decoration-none">
-                        <div class="submenu-icon mb-2">
-                            <i class="fa-solid fa-layer-group"></i>
-                        </div>
-                        <span class="submenu-text fw-bold">ประเภทคำขอ</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2-custom">
-                    <a href="<?= \App\Config\Config::SITE_URL ?>/request/track" class="submenu-item d-flex flex-column align-items-center justify-content-center p-3 rounded-3 text-decoration-none">
-                        <div class="submenu-icon mb-2">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </div>
-                        <span class="submenu-text fw-bold">ติดตามสถานะ</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2-custom">
-                    <a href="#how-to-submit" class="submenu-item d-flex flex-column align-items-center justify-content-center p-3 rounded-3 text-decoration-none">
-                        <div class="submenu-icon mb-2">
-                            <i class="fa-solid fa-list-check"></i>
-                        </div>
-                        <span class="submenu-text fw-bold">ขั้นตอนการยื่น</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2-custom">
-                    <a href="<?= \App\Config\Config::SITE_URL ?>/admin/login" class="submenu-item d-flex flex-column align-items-center justify-content-center p-3 rounded-3 text-decoration-none">
-                        <div class="submenu-icon mb-2">
-                            <i class="fa-solid fa-right-to-bracket"></i>
-                        </div>
-                        <span class="submenu-text fw-bold">เข้าสู่ระบบ</span>
-                    </a>
-                </div>
-                <div class="col-6 col-sm-4 col-md-2-custom">
-                    <a href="#how-to-submit" class="submenu-item d-flex flex-column align-items-center justify-content-center p-3 rounded-3 text-decoration-none">
-                        <div class="submenu-icon mb-2">
-                            <i class="fa-solid fa-user-plus"></i>
-                        </div>
-                        <span class="submenu-text fw-bold">สมัครสมาชิก</span>
-                    </a>
-                </div>
-            </div>
+    <!-- Laws & Regulations Section -->
+    <section class="container py-4" id="laws-section">
+        <div class="d-flex align-items-center gap-2 mb-4 border-bottom pb-2">
+            <i class="fa-solid fa-scale-balanced text-teal fs-4"></i>
+            <h3 class="fw-bold text-dark-green m-0">กฎหมาย ระเบียบ & แนวทางที่เกี่ยวข้อง</h3>
         </div>
-    </div>
 
-    <!-- Main Content -->
+        <div class="row g-4">
+            <?php if (!empty($lawsGrouped)): ?>
+                <?php foreach ($lawsGrouped as $category => $laws): ?>
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm rounded-3 overflow-hidden h-100">
+                            <div class="card-header category-header py-3 px-4"><?= esc($category) ?></div>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($laws as $law): ?>
+                                    <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $law['id'] ?>&source=laws" target="_blank" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-3 px-4 border-bottom-0 law-item">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <i class="fa-solid fa-file-pdf text-danger fs-5"></i>
+                                            <span class="text-dark small fw-medium"><?= esc($law['title']) ?></span>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-down-long text-teal"></i>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">ไม่มีกฎระเบียบข้อกฎหมายในศูนย์ข้อมูลขณะนี้</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- Download Center Section -->
+    <section class="container py-5" id="downloads-section">
+        <div class="d-flex align-items-center gap-2 mb-4 border-bottom pb-2">
+            <i class="fa-solid fa-folder-open text-teal fs-4"></i>
+            <h3 class="fw-bold text-dark-green m-0">ศูนย์ดาวน์โหลดแบบฟอร์มเอกสารเปล่า</h3>
+        </div>
+
+        <div class="row g-4">
+            <?php 
+                $standardCategories = [
+                    'Homeschool Application' => 'คำขอจัดการศึกษา (Homeschool)',
+                    'Education Plan Templates' => 'แผนการจัดการเรียนรู้',
+                    'Learning Report Templates' => 'แบบรายงานประเมินผลการเรียนรู้',
+                    'Transfer Requests' => 'คำขอโอนย้ายสถานศึกษา',
+                    'Graduation Requests' => 'คำขออนุมัติจบการศึกษา',
+                    'Other Documents' => 'เอกสารแนวทางอื่นๆ'
+                ];
+            ?>
+            <?php if (!empty($docsGrouped)): ?>
+                <?php foreach ($docsGrouped as $categoryKey => $docs): ?>
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card border-0 shadow-sm rounded-3 overflow-hidden h-100">
+                            <div class="card-header category-header py-3 px-4">
+                                <?= esc($standardCategories[$categoryKey] ?? $categoryKey) ?>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <?php foreach ($docs as $doc): ?>
+                                    <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $doc['id'] ?>&source=download_center&download=1" class="list-group-item list-group-item-action d-flex align-items-center justify-content-between py-3 px-4 border-bottom-0 doc-item">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <?php 
+                                                $ext = strtolower(pathinfo($doc['file_name'], PATHINFO_EXTENSION));
+                                                if ($ext === 'pdf') echo '<i class="fa-solid fa-file-pdf text-danger fs-5"></i>';
+                                                else echo '<i class="fa-solid fa-file-word text-primary fs-5"></i>';
+                                            ?>
+                                            <span class="text-dark small fw-medium"><?= esc($doc['title']) ?></span>
+                                        </div>
+                                        <i class="fa-solid fa-download text-teal"></i>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">ไม่มีเอกสารแบบฟอร์มให้ดาวน์โหลดในศูนย์บริการขณะนี้</p>
+                </div>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <!-- PDPA Information Section -->
+    <section class="container py-4" id="pdpa-section">
+        <div class="pdpa-box p-5 rounded-4 shadow-sm position-relative overflow-hidden border border-slate-700">
+            <div class="position-absolute top-0 end-0 p-4 opacity-5 text-white" style="font-size: 6rem;">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+            
+            <h3 class="fw-bold mb-3 d-flex align-items-center gap-2 text-warning">
+                <i class="fa-solid fa-user-lock"></i> การคุ้มครองข้อมูลส่วนบุคคล (PDPA Consent Notice)
+            </h3>
+            
+            <p style="font-size: 0.95rem; line-height: 1.8; color: #cbd5e1;">
+                สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานราธิวาส (สพม.นราธิวาส) ให้ความสำคัญอย่างยิ่งต่อความเป็นส่วนตัวและการคุ้มครองข้อมูลส่วนบุคคลของผู้ยื่นคำขอจัดตั้งและติดตามระบบบ้านเรียน การอัปโหลดเอกสารประกอบคำขอต่างๆ (เช่น สำเนาบัตรประจำตัวประชาชน, สำเนาทะเบียนบ้าน หรือระเบียนการเรียน) จะถูกนำส่งและเก็บรักษาไว้ในไดเรกทอรีส่วนตัวที่มีความปลอดภัยสูงนอก Web Root ซึ่งบุคคลภายนอกไม่สามารถเข้าถึงได้โดยตรงผ่านช่องทางอินเทอร์เน็ต
+            </p>
+            <p class="mb-0" style="font-size: 0.95rem; line-height: 1.8; color: #cbd5e1;">
+                เมื่อท่านกดกดยื่นส่งคำขอ (Submit Request) ระบบจะถือว่าท่านได้ตรวจสอบข้อมูลและ<strong>ให้ความยินยอมโดยสมัครใจ (Consent)</strong> ในการจัดเก็บและประมวลผลข้อมูลส่วนตัวเหล่านี้เพื่อใช้ในการตรวจสอบพิจารณาคุณสมบัติและการประเมินผลการเรียนรู้ตามกระบวนการทำงานของกลุ่มงานส่งเสริมการจัดการศึกษา สพม.นราธิวาส
+            </p>
+        </div>
+    </section>
+
+    <!-- Request Creation (Portal Entry) Section -->
     <main class="container py-5" id="request-types">
-        <div class="text-center mb-5 mt-5">
-            <span class="text-teal fw-bold fs-7 tracking-wider d-block mb-2">บริการของเรา</span>
-            <h2 class="fw-bold text-dark-green display-6">เลือกประเภทคำขอ</h2>
-            <p class="text-muted">เลือกบริการที่ต้องการยื่นคำขอเกี่ยวกับการจัดการศึกษา</p>
+        <div class="text-center mb-5 mt-4">
+            <span class="text-teal fw-bold fs-7 tracking-wider d-block mb-2">ยื่นส่งเอกสารออนไลน์</span>
+            <h2 class="fw-bold text-dark-green display-6">เลือกบริการที่ท่านต้องการยื่นคำขอ</h2>
+            <p class="text-muted">กรุณาดาวน์โหลดแบบฟอร์มเอกสารเปล่าจากหน้าเว็บ กรอกข้อมูล และแนบหลักฐานให้ถูกต้อง</p>
         </div>
 
         <div class="row g-4 justify-content-center">
@@ -185,7 +305,7 @@
                                 
                                 <div class="pt-3 border-top mt-auto">
                                     <a href="<?= \App\Config\Config::SITE_URL ?>/request/create?type=<?= $type['id'] ?>" class="btn btn-premium w-100 py-2">
-                                        ยื่นคำขอประเภทนี้ <i class="fa-solid fa-arrow-right ms-2"></i>
+                                        เขียนและยื่นส่งแบบฟอร์ม <i class="fa-solid fa-arrow-right ms-2"></i>
                                     </a>
                                 </div>
                             </div>
@@ -194,49 +314,18 @@
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="col-12 text-center py-5">
-                    <p class="text-muted">ไม่พบข้อมูลประเภทคำขอเอกสารในขณะนี้</p>
+                    <p class="text-muted">ไม่พบข้อมูลประเภทบริการหรือแบบฟอร์มในขณะนี้</p>
                 </div>
             <?php endif; ?>
-        </div>
-
-        <!-- Info Grid -->
-        <div class="row mt-5 pt-5 g-4 text-center">
-            <div class="col-md-4">
-                <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
-                    <div class="text-primary mb-3" style="font-size: 2.5rem;">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-                    <h5 class="fw-bold">ระบบยืนยันตัวตนด้วย OTP</h5>
-                    <p class="text-muted mb-0">ป้องกันบุคคลอื่นสวมสิทธิ์การขอรับเอกสารสำคัญ โดยระบบจะจัดส่งรหัสยืนยันไปยังอีเมลของผู้ยื่นคำขอทุกครั้ง</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
-                    <div class="text-success mb-3" style="font-size: 2.5rem;">
-                        <i class="fa-solid fa-lock"></i>
-                    </div>
-                    <h5 class="fw-bold">จัดเก็บข้อมูลปลอดภัย</h5>
-                    <p class="text-muted mb-0">เอกสารสำคัญและไฟล์ PDF ทั้งหมดจะถูกเก็บรักษาไว้นอกโฟลเดอร์สาธารณะ และต้องดาวน์โหลดผ่านตัวกลางควบคุมสิทธิ์เท่านั้น</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="p-4 bg-white rounded-4 border shadow-sm h-100">
-                    <div class="text-warning mb-3" style="font-size: 2.5rem;">
-                        <i class="fa-solid fa-comments"></i>
-                    </div>
-                    <h5 class="fw-bold">แชทคุยตรงกับเจ้าหน้าที่</h5>
-                    <p class="text-muted mb-0">หากเอกสารไม่ถูกต้อง หรือเจ้าหน้าที่ต้องการข้อมูลเพิ่ม ระบบมีฟังก์ชันสนทนาโต้ตอบผ่านรหัสคำขอได้โดยตรง</p>
-                </div>
-            </div>
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-white py-4 mt-5 border-top border-warning border-3">
         <div class="container text-center">
-            <p class="mb-1">สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานราธิวาส (สพม.นราธิวาส)</p>
+            <p class="mb-1">กลุ่มส่งเสริมการจัดการศึกษา สำนักงานเขตพื้นที่การศึกษามัธยมศึกษานราธิวาส (สพม.นราธิวาส)</p>
             <p class="text-muted small mb-0">ถนนศูนย์ราชการ ตำบลโคกเคียน อำเภอเมือง จังหวัดนราธิวาส 96000 | เบอร์โทรศัพท์: 073-511-182</p>
-            <p class="text-muted small mt-2">&copy; <?= date('Y') ?> NWT Document Submission System. All Rights Reserved.</p>
+            <p class="text-muted small mt-2">&copy; <?= date('Y') ?> Homeschool Management Portal. All Rights Reserved.</p>
         </div>
     </footer>
 

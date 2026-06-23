@@ -85,69 +85,41 @@
             </div>
 
         <?php elseif (!$isAuthenticated): ?>
-            <!-- CASE 2: OTP SECURITY REQUIRED FOR TRACKING -->
+            <!-- CASE 2: PASSWORD SECURITY FOR TRACKING -->
             <div class="row justify-content-center py-5">
                 <div class="col-md-8 col-lg-6">
                     <div class="card card-premium shadow-lg border-warning border-top border-4">
                         <div class="card-body p-4 p-md-5 text-center">
                             <div class="text-warning mb-3" style="font-size: 3rem;">
-                                <i class="fa-solid fa-user-shield"></i>
+                                <i class="fa-solid fa-user-lock"></i>
                             </div>
                             <h4 class="fw-bold text-primary mb-3">การตรวจสอบความปลอดภัย</h4>
                             <p class="text-muted mb-4">
                                 เพื่อปกป้องข้อมูลส่วนบุคคลของท่าน ระบบจำเป็นต้องตรวจสอบสิทธิ์ในการเข้าถึงคำขอหมายเลข <strong><?= esc($request['request_no']) ?></strong>
                             </p>
 
-                            <?php if (!isset($_SESSION['track_otp_sent_to'])): ?>
-                                <!-- Step A: Trigger Send OTP -->
-                                <form action="" method="POST">
-                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
-                                    <input type="hidden" name="send_track_otp" value="1">
-                                    
-                                    <div class="bg-light p-3 rounded-3 mb-4 text-start border">
-                                        <p class="mb-1 fw-bold text-secondary"><i class="fa-solid fa-envelope me-2"></i>รหัส OTP จะถูกส่งไปยังอีเมล:</p>
-                                        <p class="mb-0 text-primary fw-bold fs-5">
-                                            <?= esc(substr($request['applicant_email'], 0, 3)) ?>*****<?= esc(strstr($request['applicant_email'], '@')) ?>
-                                        </p>
-                                    </div>
-                                    
-                                    <button type="submit" class="btn btn-premium w-100 py-3 fw-bold fs-5 shadow">
-                                        <i class="fa-solid fa-paper-plane me-2"></i>ส่งรหัส OTP ยืนยันตัวตน
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <!-- Step B: Input OTP -->
-                                <?php if (isset($devOtp) && !empty($devOtp)): ?>
-                                    <div class="alert alert-warning border-warning rounded-3 mb-4 py-2" role="alert">
-                                        <i class="fa-solid fa-flask me-2 text-warning"></i><strong>[โหมดทดสอบ]</strong> รหัส OTP ปัจจุบันคือ: <strong class="fs-5 text-dark"><?= esc($devOtp) ?></strong> (หรือใช้ 123456)
-                                    </div>
-                                <?php endif; ?>
+                            <form action="" method="POST" class="needs-validation" novalidate>
+                                <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                <input type="hidden" name="verify_password" value="1">
 
-                                <form action="" method="POST" class="needs-validation" novalidate>
-                                    <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
-                                    <input type="hidden" name="verify_track_otp" value="1">
-
-                                    <div class="mb-4">
-                                        <label for="otp_code" class="form-label fw-bold d-block text-start mb-2">กรอกรหัส OTP 6 หลัก</label>
-                                        <input type="text" 
-                                               class="form-control text-center py-3 fs-3 fw-bold rounded-3 letter-spacing-lg" 
-                                               id="otp_code" 
-                                               name="otp_code" 
-                                               required 
-                                               maxlength="6" 
-                                               pattern="[0-9]{6}" 
-                                               placeholder="------"
-                                               value="<?= esc($devOtp ?? '') ?>"
-                                               autocomplete="off"
-                                               style="letter-spacing: 12px; padding-left: 20px;">
-                                        <div class="invalid-feedback text-start">กรุณากรอกตัวเลขรหัส OTP จำนวน 6 หลัก</div>
+                                <div class="mb-4 text-start">
+                                    <label for="password" class="form-label fw-bold">กรอกรหัสผ่านเข้าใช้งาน (Password)</label>
+                                    <input type="password" 
+                                           class="form-control py-3 rounded-3" 
+                                           id="password" 
+                                           name="password" 
+                                           required 
+                                           placeholder="ระบุรหัสผ่านบัญชีของท่าน">
+                                    <div class="invalid-feedback">กรุณากรอกรหัสผ่านบัญชีเพื่อเข้าสู่ระบบติดตามคำขอ</div>
+                                    <div class="form-text text-muted mt-2">
+                                        <i class="fa-solid fa-circle-info me-1"></i> หากท่านลืมรหัสผ่าน กรุณาติดต่อฝ่ายสนับสนุนหรือเจ้าหน้าที่ สพม.นราธิวาส เพื่อขอรับรหัสผ่านของท่าน
                                     </div>
+                                </div>
 
-                                    <button type="submit" class="btn btn-premium w-100 py-3 fs-5 fw-bold mb-3 shadow">
-                                        <i class="fa-solid fa-check-double me-2"></i>ยืนยันรหัส OTP
-                                    </button>
-                                </form>
-                            <?php endif; ?>
+                                <button type="submit" class="btn btn-premium w-100 py-3 fs-5 fw-bold shadow">
+                                    <i class="fa-solid fa-right-to-bracket me-2"></i>ยืนยันรหัสผ่านเพื่อเข้าถึงข้อมูล
+                                </button>
+                            </form>
                             
                             <div class="mt-4 border-top pt-3">
                                 <a href="<?= \App\Config\Config::SITE_URL ?>/request/track" class="text-decoration-none text-muted small">
@@ -169,40 +141,31 @@
                         $statusList = \App\Config\Config::getStatusList();
                         $statusName = $statusList[$request['status']] ?? $request['status'];
                         $statusBadgeClass = 'bg-secondary';
-                        $stepActive = 1; // mapping step active 1 to 5
                         
                         switch($request['status']) {
                             case 'submitted':
                                 $statusBadgeClass = 'bg-secondary';
-                                $stepActive = 1;
                                 break;
                             case 'received':
                                 $statusBadgeClass = 'bg-info text-white';
-                                $stepActive = 2;
                                 break;
                             case 'in_review':
                                 $statusBadgeClass = 'bg-warning text-dark';
-                                $stepActive = 3;
                                 break;
                             case 'need_info':
                                 $statusBadgeClass = 'bg-danger text-white animate-pulse';
-                                $stepActive = 3;
                                 break;
                             case 'pending_approval':
                                 $statusBadgeClass = 'bg-primary text-white';
-                                $stepActive = 4;
                                 break;
                             case 'approved':
                                 $statusBadgeClass = 'bg-success text-white';
-                                $stepActive = 4;
                                 break;
                             case 'completed':
                                 $statusBadgeClass = 'bg-success text-white';
-                                $stepActive = 5;
                                 break;
                             case 'rejected':
                                 $statusBadgeClass = 'bg-danger text-white';
-                                $stepActive = 5;
                                 break;
                         }
                     ?>
@@ -215,33 +178,110 @@
                                     <h3 class="fw-bold text-primary mb-0"><?= esc($request['request_no']) ?></h3>
                                 </div>
                                 <div class="text-md-end">
-                                    <span class="text-muted small d-block">สถานะปัจจุบัน</span>
+                                    <span class="text-muted small d-block">สถานะรวมระบบ</span>
                                     <span class="badge <?= $statusBadgeClass ?> px-3 py-2 fs-6 fw-bold rounded-pill"><?= esc($statusName) ?></span>
                                 </div>
                             </div>
 
-                            <!-- Process Timeline Progress (1 to 5) -->
-                            <h5 class="fw-bold mb-4"><i class="fa-solid fa-route text-warning me-2"></i>ขั้นตอนการดำเนินงาน</h5>
-                            <div class="timeline-steps">
-                                <div class="timeline-step-item <?= $stepActive >= 1 ? ($stepActive > 1 ? 'completed' : 'active') : '' ?>">
-                                    <?php if ($stepActive > 1): ?><i class="fa-solid fa-check"></i><?php else: ?>1<?php endif; ?>
-                                    <div class="timeline-label">ยื่นคำขอแล้ว</div>
+                            <!-- Process 1 & Process 2 status timelines -->
+                            <h5 class="fw-bold mb-4"><i class="fa-solid fa-route text-warning me-2"></i>ขั้นตอนการดำเนินงานแยกตามกระบวนการ</h5>
+                            <div class="row g-4 mb-5">
+                                <!-- Process 1: Permission -->
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0 shadow-sm rounded-3 h-100">
+                                        <div class="card-body p-4">
+                                            <h6 class="fw-bold text-primary mb-3 d-flex align-items-center justify-content-between">
+                                                <span><i class="fa-solid fa-file-signature text-warning me-2"></i>กระบวนการ 1: การอนุญาตจัดตั้ง</span>
+                                                <?php
+                                                    $p1Status = $request['process_1_status'] ?? 'submitted';
+                                                    $p1Badge = 'bg-secondary';
+                                                    $p1Text = 'ยื่นคำขอ';
+                                                    if ($p1Status === 'in_review') { $p1Badge = 'bg-warning text-dark'; $p1Text = 'กำลังพิจารณา'; }
+                                                    elseif ($p1Status === 'approved') { $p1Badge = 'bg-success'; $p1Text = 'ได้รับอนุมัติ'; }
+                                                    elseif ($p1Status === 'rejected') { $p1Badge = 'bg-danger'; $p1Text = 'ปฏิเสธ'; }
+                                                ?>
+                                                <span class="badge <?= $p1Badge ?> rounded-pill font-monospace"><?= $p1Text ?></span>
+                                            </h6>
+                                            
+                                            <!-- Steps Timeline for Process 1 -->
+                                            <div class="d-flex justify-content-between align-items-center mt-4 position-relative px-2">
+                                                <div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 12px; z-index: 0; left: 15px; right: 15px;"></div>
+                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p1Status === 'submitted' ? '0%' : ($p1Status === 'in_review' ? '50%' : '100%') ?>; z-index: 0; left: 15px; transition: width 0.3s;"></div>
+                                                
+                                                <!-- Step 1 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="fa-solid fa-check fs-8"></i></span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">ส่งคำขอแล้ว</div>
+                                                </div>
+                                                <!-- Step 2 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isP1Active = ($p1Status === 'in_review'); $isP1Done = in_array($p1Status, ['approved', 'rejected']); ?>
+                                                    <span class="rounded-circle <?= $isP1Done ? 'bg-primary text-white' : ($isP1Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP1Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">พิจารณาคุณสมบัติ</div>
+                                                </div>
+                                                <!-- Step 3 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isP1Approved = ($p1Status === 'approved'); $isP1Rejected = ($p1Status === 'rejected'); ?>
+                                                    <span class="rounded-circle <?= $isP1Approved ? 'bg-success text-white' : ($isP1Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP1Approved): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isP1Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>3<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;"><?= $p1Status === 'rejected' ? 'ปฏิเสธ' : 'อนุมัติจัดตั้ง' ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="timeline-step-item <?= $stepActive >= 2 ? ($stepActive > 2 ? 'completed' : 'active') : '' ?>">
-                                    <?php if ($stepActive > 2): ?><i class="fa-solid fa-check"></i><?php else: ?>2<?php endif; ?>
-                                    <div class="timeline-label">รับเรื่อง</div>
-                                </div>
-                                <div class="timeline-step-item <?= $stepActive >= 3 ? ($stepActive > 3 ? 'completed' : 'active') : '' ?>">
-                                    <?php if ($stepActive > 3): ?><i class="fa-solid fa-check"></i><?php else: ?>3<?php endif; ?>
-                                    <div class="timeline-label">ตรวจเอกสาร</div>
-                                </div>
-                                <div class="timeline-step-item <?= $stepActive >= 4 ? ($stepActive > 4 ? 'completed' : 'active') : '' ?>">
-                                    <?php if ($stepActive > 4): ?><i class="fa-solid fa-check"></i><?php else: ?>4<?php endif; ?>
-                                    <div class="timeline-label">รอผลพิจารณา</div>
-                                </div>
-                                <div class="timeline-step-item <?= $stepActive >= 5 ? ($request['status'] === 'rejected' ? 'active bg-danger border-danger text-white' : 'completed') : '' ?>">
-                                    <?php if ($request['status'] === 'rejected'): ?><i class="fa-solid fa-xmark"></i><?php elseif ($stepActive >= 5): ?><i class="fa-solid fa-check"></i><?php else: ?>5<?php endif; ?>
-                                    <div class="timeline-label"><?= $request['status'] === 'rejected' ? 'ปฏิเสธ' : 'รับเอกสารเสร็จสิ้น' ?></div>
+
+                                <!-- Process 2: Assessment -->
+                                <div class="col-md-6">
+                                    <div class="card bg-light border-0 shadow-sm rounded-3 h-100">
+                                        <div class="card-body p-4">
+                                            <h6 class="fw-bold text-primary mb-3 d-flex align-items-center justify-content-between">
+                                                <span><i class="fa-solid fa-award text-warning me-2"></i>กระบวนการ 2: การประเมินสัมฤทธิผล</span>
+                                                <?php
+                                                    $p2Status = $request['process_2_status'] ?? 'not_started';
+                                                    $p2Badge = 'bg-secondary';
+                                                    $p2Text = 'ยังไม่เริ่ม';
+                                                    if ($p2Status === 'in_review') { $p2Badge = 'bg-warning text-dark'; $p2Text = 'กำลังประเมิน'; }
+                                                    elseif ($p2Status === 'completed') { $p2Badge = 'bg-success'; $p2Text = 'ประเมินเสร็จสิ้น'; }
+                                                    elseif ($p2Status === 'rejected') { $p2Badge = 'bg-danger'; $p2Text = 'ไม่ผ่าน'; }
+                                                ?>
+                                                <span class="badge <?= $p2Badge ?> rounded-pill font-monospace"><?= $p2Text ?></span>
+                                            </h6>
+                                            
+                                            <!-- Steps Timeline for Process 2 -->
+                                            <div class="d-flex justify-content-between align-items-center mt-4 position-relative px-2">
+                                                <div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 12px; z-index: 0; left: 15px; right: 15px;"></div>
+                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p2Status === 'not_started' ? '0%' : ($p2Status === 'in_review' ? '50%' : '100%') ?>; z-index: 0; left: 15px; transition: width 0.3s;"></div>
+                                                
+                                                <!-- Step 1 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <span class="rounded-circle <?= $p2Status !== 'not_started' ? 'bg-primary text-white' : 'bg-secondary text-white' ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($p2Status !== 'not_started'): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>1<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">เตรียมหลักฐาน</div>
+                                                </div>
+                                                <!-- Step 2 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isP2Active = ($p2Status === 'in_review'); $isP2Done = in_array($p2Status, ['completed', 'rejected']); ?>
+                                                    <span class="rounded-circle <?= $isP2Done ? 'bg-primary text-white' : ($isP2Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP2Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">การประเมินความรู้</div>
+                                                </div>
+                                                <!-- Step 3 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isP2Completed = ($p2Status === 'completed'); $isP2Rejected = ($p2Status === 'rejected'); ?>
+                                                    <span class="rounded-circle <?= $isP2Completed ? 'bg-success text-white' : ($isP2Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP2Completed): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isP2Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>3<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;"><?= $p2Status === 'rejected' ? 'ไม่ผ่านประเมิน' : 'ประเมินเสร็จสิ้น' ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -268,31 +308,96 @@
                                     foreach ($formData as $label => $value):
                                 ?>
                                     <div class="col-sm-6">
-                                        <strong><?= esc($label === 'school_name' ? 'โรงเรียนสุดท้ายที่ศึกษา' : ($label === 'grad_year' ? 'ปีการศึกษาที่จบ' : ($label === 'purpose' ? 'วัตถุประสงค์' : $label))) ?>:</strong> 
+                                        <strong><?= esc($label === 'school_name' ? 'โรงเรียนสุดท้ายที่ศึกษา/ชื่อบ้านเรียน' : ($label === 'grad_year' ? 'ปีการศึกษาที่จัดตั้ง' : ($label === 'purpose' ? 'แผนหลักการเรียนรู้' : $label))) ?>:</strong> 
                                         <?= esc($value) ?>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
 
-                            <!-- Attachments List -->
-                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-paperclip text-warning me-2"></i> เอกสารหลักฐานที่ยื่น</h5>
+                            <!-- Attachments List divided by uploader -->
+                            <?php 
+                                $applicantFiles = [];
+                                $officerFiles = [];
+                                foreach ($attachments as $file) {
+                                    if ($file['uploaded_by'] === 'officer') {
+                                        $officerFiles[] = $file;
+                                    } else {
+                                        $applicantFiles[] = $file;
+                                    }
+                                }
+                            ?>
+
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-paperclip text-warning me-2"></i> 1) เอกสารหลักฐานที่แนบโดยผู้ปกครอง</h5>
                             <div class="list-group rounded-3 mb-4">
-                                <?php if (!empty($attachments)): ?>
-                                    <?php foreach ($attachments as $file): ?>
+                                <?php if (!empty($applicantFiles)): ?>
+                                    <?php foreach ($applicantFiles as $file): ?>
                                         <div class="list-group-item d-flex justify-content-between align-items-center py-3">
                                             <div>
                                                 <i class="fa-regular fa-file-pdf text-danger fs-4 me-2 align-middle"></i>
                                                 <span class="fw-bold text-secondary align-middle"><?= esc($file['file_name']) ?></span>
-                                                <span class="badge bg-secondary ms-2 align-middle">v<?= esc($file['version']) ?></span>
                                                 <span class="text-muted small ms-3 align-middle">ขนาด: <?= esc(round($file['file_size'] / (1024*1024), 2)) ?> MB</span>
+                                                <span class="text-muted small ms-2 align-middle">| เมื่อ: <?= date('d/m/Y H:i', strtotime($file['created_at'])) ?></span>
                                             </div>
-                                            <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $file['id'] ?>" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                            <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $file['id'] ?>&source=request_attachment" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-3">
                                                 <i class="fa-solid fa-eye me-1"></i> ดูเอกสาร
                                             </a>
                                         </div>
                                     <?php endforeach; ?>
                                 <?php else: ?>
-                                    <div class="list-group-item text-center text-muted py-3">ไม่พบเอกสารแนบ</div>
+                                    <div class="list-group-item text-center text-muted py-3">ไม่พบเอกสารหลักฐานที่ส่ง</div>
+                                <?php endif; ?>
+                            </div>
+
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-file-invoice text-success me-2"></i> 2) หนังสือราชการและเอกสารตอบกลับจากเจ้าหน้าที่</h5>
+                            <div class="list-group rounded-3 mb-4">
+                                <?php if (!empty($officerFiles)): ?>
+                                    <?php foreach ($officerFiles as $file): ?>
+                                        <div class="list-group-item d-flex justify-content-between align-items-center py-3 bg-light">
+                                            <div>
+                                                <i class="fa-solid fa-file-pdf text-danger fs-4 me-2 align-middle"></i>
+                                                <span class="fw-bold text-dark align-middle"><?= esc($file['file_name']) ?></span>
+                                                <span class="badge bg-success ms-2 align-middle">
+                                                    <?php 
+                                                        if ($file['attachment_type'] === 'official_letter') echo 'หนังสือแจ้งทางการ';
+                                                        elseif ($file['attachment_type'] === 'approval_document') echo 'ใบอนุญาตจัดตั้ง';
+                                                        elseif ($file['attachment_type'] === 'notification_letter') echo 'หนังสือแจ้งผลการประเมิน';
+                                                        else echo 'เอกสารราชการอื่นๆ';
+                                                    ?>
+                                                </span>
+                                                <span class="text-muted small ms-3 align-middle">ขนาด: <?= esc(round($file['file_size'] / (1024*1024), 2)) ?> MB</span>
+                                            </div>
+                                            <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $file['id'] ?>&source=request_attachment" target="_blank" class="btn btn-success btn-sm rounded-pill px-3 text-white">
+                                                <i class="fa-solid fa-download me-1"></i> ดาวน์โหลด
+                                            </a>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="list-group-item text-center text-muted py-3">ยังไม่มีหนังสือราชการที่ตอบกลับในขณะนี้</div>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Meeting Results List -->
+                            <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-teal me-2"></i> 3) สรุปรายงานและมติที่ประชุมคณะอนุกรรมการ</h5>
+                            <div class="list-group rounded-3 mb-4">
+                                <?php if (!empty($meetingResults)): ?>
+                                    <?php foreach ($meetingResults as $meeting): ?>
+                                        <div class="list-group-item p-4 bg-white border-teal border-start border-3 mb-2 rounded-3 shadow-sm">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <span class="fw-bold text-teal"><i class="fa-regular fa-calendar-check me-2"></i>การประชุมเมื่อวันที่: <?= date('d/m/Y', strtotime($meeting['meeting_date'])) ?></span>
+                                                <span class="small text-muted">บันทึกเมื่อ: <?= date('d/m/Y H:i', strtotime($meeting['created_at'])) ?></span>
+                                            </div>
+                                            <p class="mb-3 text-secondary" style="font-size: 0.95rem; line-height: 1.6;"><?= nl2br(esc($meeting['result_summary'])) ?></p>
+                                            <?php if (!empty($meeting['file_name'])): ?>
+                                                <div class="mt-2 pt-2 border-top">
+                                                    <a href="<?= \App\Config\Config::SITE_URL ?>/download?id=<?= $meeting['id'] ?>&source=meeting" target="_blank" class="btn btn-outline-danger btn-sm rounded-pill">
+                                                        <i class="fa-solid fa-file-pdf me-1"></i> เปิดดูเอกสารสรุป/มติที่ประชุม (PDF)
+                                                    </a>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <div class="list-group-item text-center text-muted py-3">ยังไม่มีการบันทึกรายงานสรุปการประชุมคณะกรรมการ</div>
                                 <?php endif; ?>
                             </div>
 
@@ -301,7 +406,7 @@
                                 <div class="card border-danger bg-danger bg-opacity-10 rounded-3 mb-4">
                                     <div class="card-body p-4">
                                         <h5 class="fw-bold text-danger mb-2"><i class="fa-solid fa-upload me-2 animate-bounce"></i>แนบเอกสารเพิ่มเติมเพื่อแก้ไขข้อผิดพลาด</h5>
-                                        <p class="text-secondary small mb-3">โปรดอัปโหลดไฟล์ PDF ฉบับแก้ไขหรือเอกสารเพิ่มเติมตามเหตุผลข้างต้น เจ้าหน้าที่จะได้รับการแจ้งเตือนเพื่อสืบตรวจต่อทันที</p>
+                                        <p class="text-secondary small mb-3">โปรดอัปโหลดไฟล์ PDF ฉบับแก้ไขหรือเอกสารเพิ่มเติมตามเหตุผลที่ระบุไว้ เจ้าหน้าที่จะได้รับการแจ้งเตือนและประมวลผลต่อทันที</p>
                                         
                                         <form action="" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                                             <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
