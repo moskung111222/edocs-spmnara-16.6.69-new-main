@@ -74,7 +74,7 @@ FLUSH PRIVILEGES;
 # Database configuration สำหรับ localhost
 DB_HOST=127.0.0.1
 DB_USER=sesaonara_edocs
-DB_PASS=Thi$i$spmnara15
+DB_PASS=
 DB_NAME=sesaonara_edocs
 DB_PORT=3306
 
