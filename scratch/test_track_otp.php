@@ -8,7 +8,7 @@ if (file_exists($cookieFile)) {
     unlink($cookieFile);
 }
 
-$requestNo = 'NWT-HS-2569-000003';
+$requestNo = 'NWT-HMS-2569-000002';
 echo "Step 1: Searching for request: $requestNo...\n";
 
 $ch = curl_init('http://localhost:8080/request/track?no=' . urlencode($requestNo));

@@ -21,11 +21,11 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ============================================================
 -- 1. DATABASE CREATION
 -- ============================================================
-CREATE DATABASE IF NOT EXISTS `sesaonara_edocs`
+CREATE DATABASE IF NOT EXISTS `sesaonara_homeschool`
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE `sesaonara_edocs`;
+USE `sesaonara_homeschool`;
 
 -- ============================================================
 -- 2. TABLE CREATION
