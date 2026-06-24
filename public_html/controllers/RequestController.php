@@ -354,17 +354,25 @@ class RequestController {
                             $_SESSION['flash_success'] = "ส่งข้อความสำเร็จ";
                             header("Location: " . Config::SITE_URL . "/request/track?no=" . urlencode($requestNo));
                             exit;
-                        } elseif ($action === 'upload_doc') {
-                            if ($request['status'] !== Config::STATUS_NEED_INFO) {
-                                throw new Exception("สามารถแนบเอกสารเพิ่มเติมได้เฉพาะเมื่อคำขออยู่ในสถานะ 'ขอข้อมูลเพิ่มเติม/แก้ไขเอกสาร' เท่านั้น");
+                        } elseif ($action === 'upload_doc' || $action === 'upload_report') {
+                            $fileKey = ($action === 'upload_report') ? 'report_file' : 'additional_doc';
+
+                            if ($action === 'upload_report') {
+                                if (!in_array($request['process_2_status'], ['waiting_report', 'report_review'])) {
+                                    throw new Exception("สามารถแนบรายงานผลการเรียนรู้ได้เฉพาะเมื่ออยู่ในขั้นตอนรอรายงานหรือขอแก้ไขรายงานเท่านั้น");
+                                }
+                            } else {
+                                if ($request['status'] !== Config::STATUS_NEED_INFO) {
+                                    throw new Exception("สามารถแนบเอกสารเพิ่มเติมได้เฉพาะเมื่อคำขออยู่ในสถานะ 'ขอข้อมูลเพิ่มเติม/แก้ไขเอกสาร' เท่านั้น");
+                                }
                             }
 
-                            if (!isset($_FILES['additional_doc']) || $_FILES['additional_doc']['error'] === UPLOAD_ERR_NO_FILE) {
+                            if (!isset($_FILES[$fileKey]) || $_FILES[$fileKey]['error'] === UPLOAD_ERR_NO_FILE) {
                                 throw new Exception("กรุณาเลือกไฟล์เอกสารที่ต้องการแนบ");
                             }
 
                             // Secure PDF upload
-                            $fileMeta = UploadService::uploadPDF($_FILES['additional_doc']);
+                            $fileMeta = UploadService::uploadPDF($_FILES[$fileKey]);
 
                             // Calculate version
                             $nextVer = Attachment::getNextVersion($request['id'], $fileMeta['original_name']);
@@ -391,20 +399,30 @@ class RequestController {
                                 'supporting_document'
                             );
 
-                            // Change status back to submitted
-                            RequestService::changeStatus(
-                                $request['id'],
-                                Config::STATUS_SUBMITTED,
-                                "ผู้ยื่นคำขอแนบเอกสารเพิ่มเติม: " . $fileMeta['original_name'],
-                                null,
-                                $_SERVER['REMOTE_ADDR'] ?? '',
-                                $_SERVER['HTTP_USER_AGENT'] ?? ''
-                            );
-                            
-                            // Log to workflow_history
-                            WorkflowHistory::log($request['id'], 'upload_attachment', "ผู้ยื่นคำขออัปโหลดไฟล์หลักฐานเพิ่ม: " . $fileMeta['original_name'], null, $request['applicant_id']);
+                            if ($action === 'upload_report') {
+                                // Update process_2_status to report_submitted
+                                $db = Database::getConnection();
+                                $stmt = $db->prepare("UPDATE requests SET process_2_status = 'report_submitted', updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+                                $stmt->bind_param("i", $request['id']);
+                                $stmt->execute();
+                                $stmt->close();
+                                
+                                WorkflowHistory::log($request['id'], 'upload_report', "ผู้ยื่นคำขอส่งรายงานผลการประเมินการเรียนรู้: " . $fileMeta['original_name'], null, $request['applicant_id']);
+                                $_SESSION['flash_success'] = "อัปโหลดและส่งรายงานผลการเรียนรู้เรียบร้อยแล้ว";
+                            } else {
+                                // Change status back to submitted
+                                RequestService::changeStatus(
+                                    $request['id'],
+                                    Config::STATUS_SUBMITTED,
+                                    "ผู้ยื่นคำขอแนบเอกสารเพิ่มเติม: " . $fileMeta['original_name'],
+                                    null,
+                                    $_SERVER['REMOTE_ADDR'] ?? '',
+                                    $_SERVER['HTTP_USER_AGENT'] ?? ''
+                                );
+                                WorkflowHistory::log($request['id'], 'upload_attachment', "ผู้ยื่นคำขออัปโหลดไฟล์หลักฐานเพิ่ม: " . $fileMeta['original_name'], null, $request['applicant_id']);
+                                $_SESSION['flash_success'] = "อัปโหลดเอกสารเพิ่มเติมสำเร็จ";
+                            }
 
-                            $_SESSION['flash_success'] = "อัปโหลดเอกสารเพิ่มเติมสำเร็จ";
                             header("Location: " . Config::SITE_URL . "/request/track?no=" . urlencode($requestNo));
                             exit;
                         }

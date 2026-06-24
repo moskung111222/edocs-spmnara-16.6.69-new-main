@@ -253,10 +253,14 @@
                                                     <div class="mb-2">
                                                         <label class="form-label small fw-bold">สถานะกระบวนการที่ 1</label>
                                                         <select class="form-select form-select-sm" name="process_1_status" required>
-                                                            <option value="submitted" <?= ($request['process_1_status'] ?? 'submitted') === 'submitted' ? 'selected' : '' ?>>ยื่นคำขอแล้ว</option>
-                                                            <option value="in_review" <?= ($request['process_1_status'] ?? '') === 'in_review' ? 'selected' : '' ?>>อยู่ระหว่างพิจารณา</option>
-                                                            <option value="approved" <?= ($request['process_1_status'] ?? '') === 'approved' ? 'selected' : '' ?>>อนุมัติจัดตั้งสำเร็จ</option>
-                                                            <option value="rejected" <?= ($request['process_1_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ปฏิเสธการจัดตั้ง</option>
+                                                            <option value="submitted" <?= ($request['process_1_status'] ?? 'submitted') === 'submitted' ? 'selected' : '' ?>>ยื่นคำขอแล้ว (submitted)</option>
+                                                            <option value="document_review" <?= ($request['process_1_status'] ?? '') === 'document_review' ? 'selected' : '' ?>>ตรวจสอบเอกสาร (document_review)</option>
+                                                            <option value="need_revision" <?= ($request['process_1_status'] ?? '') === 'need_revision' ? 'selected' : '' ?>>ขอแก้ไขเอกสาร (need_revision)</option>
+                                                            <option value="waiting_meeting" <?= ($request['process_1_status'] ?? '') === 'waiting_meeting' ? 'selected' : '' ?>>รอประชุมคณะกรรมการ (waiting_meeting)</option>
+                                                            <option value="meeting_result_received" <?= ($request['process_1_status'] ?? '') === 'meeting_result_received' ? 'selected' : '' ?>>ได้รับผลประชุม (meeting_result_received)</option>
+                                                            <option value="result_notified" <?= ($request['process_1_status'] ?? '') === 'result_notified' ? 'selected' : '' ?>>แจ้งผลมติการจัดตั้ง (result_notified)</option>
+                                                            <option value="completed" <?= ($request['process_1_status'] ?? '') === 'completed' ? 'selected' : '' ?>>อนุมัติจัดตั้งสำเร็จ (completed)</option>
+                                                            <option value="rejected" <?= ($request['process_1_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ปฏิเสธการจัดตั้ง (rejected)</option>
                                                         </select>
                                                     </div>
                                                     <div class="mb-2">
@@ -288,10 +292,12 @@
                                                     <div class="mb-2">
                                                         <label class="form-label small fw-bold">สถานะกระบวนการที่ 2</label>
                                                         <select class="form-select form-select-sm" name="process_2_status" required>
-                                                            <option value="not_started" <?= ($request['process_2_status'] ?? 'not_started') === 'not_started' ? 'selected' : '' ?>>ยังไม่เริ่มดำเนินการ</option>
-                                                            <option value="in_review" <?= ($request['process_2_status'] ?? '') === 'in_review' ? 'selected' : '' ?>>อยู่ระหว่างการประเมิน</option>
-                                                            <option value="completed" <?= ($request['process_2_status'] ?? '') === 'completed' ? 'selected' : '' ?>>ประเมินสำเร็จ & อนุมัติจบ</option>
-                                                            <option value="rejected" <?= ($request['process_2_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ไม่ผ่านเกณฑ์ประเมิน</option>
+                                                            <option value="not_started" <?= ($request['process_2_status'] ?? 'not_started') === 'not_started' ? 'selected' : '' ?>>ยังไม่เริ่มดำเนินการ (not_started)</option>
+                                                            <option value="waiting_report" <?= ($request['process_2_status'] ?? '') === 'waiting_report' ? 'selected' : '' ?>>รอรายงานจากผู้ปกครอง (waiting_report)</option>
+                                                            <option value="report_submitted" <?= ($request['process_2_status'] ?? '') === 'report_submitted' ? 'selected' : '' ?>>ผู้ปกครองส่งรายงานแล้ว (report_submitted)</option>
+                                                            <option value="report_review" <?= ($request['process_2_status'] ?? '') === 'report_review' ? 'selected' : '' ?>>อยู่ระหว่างตรวจสอบรายงาน (report_review)</option>
+                                                            <option value="report_completed" <?= ($request['process_2_status'] ?? '') === 'report_completed' ? 'selected' : '' ?>>เสร็จสิ้นการประเมินประจำปี (report_completed)</option>
+                                                            <option value="rejected" <?= ($request['process_2_status'] ?? '') === 'rejected' ? 'selected' : '' ?>>ไม่ผ่านเกณฑ์ประเมิน (rejected)</option>
                                                         </select>
                                                     </div>
                                                     <div class="mb-2">

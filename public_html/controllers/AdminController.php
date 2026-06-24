@@ -104,8 +104,14 @@ class AdminController {
                         $reason    = trim($_POST['reason'] ?? '');
                         
                         $db = Database::getConnection();
-                        $stmt = $db->prepare("UPDATE requests SET process_1_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-                        $stmt->bind_param("si", $newStatus, $id);
+                        if ($newStatus === 'completed') {
+                            $stmt = $db->prepare("UPDATE requests SET process_1_status = ?, process_2_status = 'waiting_report', status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+                            $stmt->bind_param("si", $newStatus, $id);
+                        } else {
+                            $overallStatus = ($newStatus === 'need_revision') ? Config::STATUS_NEED_INFO : Config::STATUS_IN_REVIEW;
+                            $stmt = $db->prepare("UPDATE requests SET process_1_status = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+                            $stmt->bind_param("ssi", $newStatus, $overallStatus, $id);
+                        }
                         $stmt->execute();
                         $stmt->close();
                         
@@ -135,8 +141,14 @@ class AdminController {
                         $reason    = trim($_POST['reason'] ?? '');
                         
                         $db = Database::getConnection();
-                        $stmt = $db->prepare("UPDATE requests SET process_2_status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
-                        $stmt->bind_param("si", $newStatus, $id);
+                        if ($newStatus === 'report_completed') {
+                            $stmt = $db->prepare("UPDATE requests SET process_2_status = ?, status = 'completed', updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+                            $stmt->bind_param("si", $newStatus, $id);
+                        } else {
+                            $overallStatus = ($newStatus === 'report_review') ? Config::STATUS_IN_REVIEW : Config::STATUS_IN_REVIEW;
+                            $stmt = $db->prepare("UPDATE requests SET process_2_status = ?, status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?");
+                            $stmt->bind_param("ssi", $newStatus, $overallStatus, $id);
+                        }
                         $stmt->execute();
                         $stmt->close();
                         

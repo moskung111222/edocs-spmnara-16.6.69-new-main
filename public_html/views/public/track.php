@@ -58,8 +58,8 @@
                             <div class="mb-2" style="font-size: 2.5rem;">
                                 <i class="fa-solid fa-magnifying-glass-location text-warning"></i>
                             </div>
-                            <h4 class="mb-1 fw-bold text-dark-green">ค้นหาและติดตามคำขอ</h4>
-                            <p class="mb-0 text-muted">ตรวจสอบสถานะใบแทนใบสุทธิและผลการเรียน</p>
+                             <h4 class="mb-1 fw-bold text-dark-green">ค้นหาและติดตามคำขอ</h4>
+                             <p class="mb-0 text-muted">ตรวจสอบสถานะการขออนุญาตและการประเมินผลบ้านเรียน (Homeschool)</p>
                         </div>
                         <div class="card-body p-4 p-md-5">
                             <form action="" method="GET" class="needs-validation" novalidate>
@@ -195,10 +195,14 @@
                                                 <?php
                                                     $p1Status = $request['process_1_status'] ?? 'submitted';
                                                     $p1Badge = 'bg-secondary';
-                                                    $p1Text = 'ยื่นคำขอ';
-                                                    if ($p1Status === 'in_review') { $p1Badge = 'bg-warning text-dark'; $p1Text = 'กำลังพิจารณา'; }
-                                                    elseif ($p1Status === 'approved') { $p1Badge = 'bg-success'; $p1Text = 'ได้รับอนุมัติ'; }
-                                                    elseif ($p1Status === 'rejected') { $p1Badge = 'bg-danger'; $p1Text = 'ปฏิเสธ'; }
+                                                    $p1Text = 'ยื่นคำขอแล้ว';
+                                                    if ($p1Status === 'document_review') { $p1Badge = 'bg-info text-white'; $p1Text = 'อยู่ระหว่างตรวจเอกสาร'; }
+                                                    elseif ($p1Status === 'need_revision') { $p1Badge = 'bg-danger text-white animate-pulse'; $p1Text = 'ขอแก้ไขเอกสาร'; }
+                                                    elseif ($p1Status === 'waiting_meeting') { $p1Badge = 'bg-warning text-dark'; $p1Text = 'รอประชุมคณะอนุกรรมการ'; }
+                                                    elseif ($p1Status === 'meeting_result_received') { $p1Badge = 'bg-primary text-white'; $p1Text = 'ได้รับผลประชุมแล้ว'; }
+                                                    elseif ($p1Status === 'result_notified') { $p1Badge = 'bg-info text-white'; $p1Text = 'แจ้งผลมติการจัดตั้ง'; }
+                                                    elseif ($p1Status === 'completed') { $p1Badge = 'bg-success text-white'; $p1Text = 'อนุมัติจัดตั้งสำเร็จ'; }
+                                                    elseif ($p1Status === 'rejected') { $p1Badge = 'bg-danger text-white'; $p1Text = 'ปฏิเสธการจัดตั้ง'; }
                                                 ?>
                                                 <span class="badge <?= $p1Badge ?> rounded-pill font-monospace"><?= $p1Text ?></span>
                                             </h6>
@@ -206,28 +210,53 @@
                                             <!-- Steps Timeline for Process 1 -->
                                             <div class="d-flex justify-content-between align-items-center mt-4 position-relative px-2">
                                                 <div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 12px; z-index: 0; left: 15px; right: 15px;"></div>
-                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p1Status === 'submitted' ? '0%' : ($p1Status === 'in_review' ? '50%' : '100%') ?>; z-index: 0; left: 15px; transition: width 0.3s;"></div>
+                                                <?php
+                                                    $p1Step = 1;
+                                                    if (in_array($p1Status, ['document_review', 'need_revision'])) $p1Step = 2;
+                                                    elseif (in_array($p1Status, ['waiting_meeting', 'meeting_result_received'])) $p1Step = 3;
+                                                    elseif ($p1Status === 'result_notified') $p1Step = 4;
+                                                    elseif (in_array($p1Status, ['completed', 'rejected'])) $p1Step = 5;
+                                                    
+                                                    $p1Width = (($p1Step - 1) / 4) * 100;
+                                                ?>
+                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p1Width ?>%; z-index: 0; left: 15px; transition: width 0.3s;"></div>
                                                 
                                                 <!-- Step 1 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
                                                     <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;"><i class="fa-solid fa-check fs-8"></i></span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">ส่งคำขอแล้ว</div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">ยื่นคำขอ</div>
                                                 </div>
                                                 <!-- Step 2 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
-                                                    <?php $isP1Active = ($p1Status === 'in_review'); $isP1Done = in_array($p1Status, ['approved', 'rejected']); ?>
-                                                    <span class="rounded-circle <?= $isP1Done ? 'bg-primary text-white' : ($isP1Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                                                        <?php if ($isP1Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
+                                                    <?php $isStep2Done = $p1Step > 2; $isStep2Active = $p1Step === 2; ?>
+                                                    <span class="rounded-circle <?= $isStep2Done ? 'bg-primary text-white' : ($isStep2Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isStep2Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
                                                     </span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">พิจารณาคุณสมบัติ</div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">ตรวจเอกสาร</div>
                                                 </div>
                                                 <!-- Step 3 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
-                                                    <?php $isP1Approved = ($p1Status === 'approved'); $isP1Rejected = ($p1Status === 'rejected'); ?>
-                                                    <span class="rounded-circle <?= $isP1Approved ? 'bg-success text-white' : ($isP1Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                                                        <?php if ($isP1Approved): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isP1Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>3<?php endif; ?>
+                                                    <?php $isStep3Done = $p1Step > 3; $isStep3Active = $p1Step === 3; ?>
+                                                    <span class="rounded-circle <?= $isStep3Done ? 'bg-primary text-white' : ($isStep3Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isStep3Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>3<?php endif; ?>
                                                     </span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;"><?= $p1Status === 'rejected' ? 'ปฏิเสธ' : 'อนุมัติจัดตั้ง' ?></div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">ประชุมสรุป</div>
+                                                </div>
+                                                <!-- Step 4 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isStep4Done = $p1Step > 4; $isStep4Active = $p1Step === 4; ?>
+                                                    <span class="rounded-circle <?= $isStep4Done ? 'bg-primary text-white' : ($isStep4Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isStep4Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>4<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">แจ้งผลมติ</div>
+                                                </div>
+                                                <!-- Step 5 -->
+                                                <div class="text-center position-relative" style="z-index: 1;">
+                                                    <?php $isStep5Completed = ($p1Status === 'completed'); $isStep5Rejected = ($p1Status === 'rejected'); ?>
+                                                    <span class="rounded-circle <?= $isStep5Completed ? 'bg-success text-white' : ($isStep5Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isStep5Completed): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isStep5Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>5<?php endif; ?>
+                                                    </span>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;"><?= $p1Status === 'rejected' ? 'ปฏิเสธ' : 'จัดตั้งสำเร็จ' ?></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -244,9 +273,11 @@
                                                     $p2Status = $request['process_2_status'] ?? 'not_started';
                                                     $p2Badge = 'bg-secondary';
                                                     $p2Text = 'ยังไม่เริ่ม';
-                                                    if ($p2Status === 'in_review') { $p2Badge = 'bg-warning text-dark'; $p2Text = 'กำลังประเมิน'; }
-                                                    elseif ($p2Status === 'completed') { $p2Badge = 'bg-success'; $p2Text = 'ประเมินเสร็จสิ้น'; }
-                                                    elseif ($p2Status === 'rejected') { $p2Badge = 'bg-danger'; $p2Text = 'ไม่ผ่าน'; }
+                                                    if ($p2Status === 'waiting_report') { $p2Badge = 'bg-info text-white animate-pulse'; $p2Text = 'รอรายงานจากผู้ปกครอง'; }
+                                                    elseif ($p2Status === 'report_submitted') { $p2Badge = 'bg-warning text-dark'; $p2Text = 'ส่งรายงานแล้ว'; }
+                                                    elseif ($p2Status === 'report_review') { $p2Badge = 'bg-primary text-white'; $p2Text = 'อยู่ระหว่างตรวจสอบรายงาน'; }
+                                                    elseif ($p2Status === 'report_completed') { $p2Badge = 'bg-success text-white'; $p2Text = 'เสร็จสิ้นการประเมิน'; }
+                                                    elseif ($p2Status === 'rejected') { $p2Badge = 'bg-danger text-white'; $p2Text = 'ไม่ผ่านเกณฑ์'; }
                                                 ?>
                                                 <span class="badge <?= $p2Badge ?> rounded-pill font-monospace"><?= $p2Text ?></span>
                                             </h6>
@@ -254,30 +285,38 @@
                                             <!-- Steps Timeline for Process 2 -->
                                             <div class="d-flex justify-content-between align-items-center mt-4 position-relative px-2">
                                                 <div class="position-absolute start-0 end-0 bg-secondary" style="height: 3px; top: 12px; z-index: 0; left: 15px; right: 15px;"></div>
-                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p2Status === 'not_started' ? '0%' : ($p2Status === 'in_review' ? '50%' : '100%') ?>; z-index: 0; left: 15px; transition: width 0.3s;"></div>
+                                                <?php
+                                                    $p2Step = 0;
+                                                    if ($p2Status === 'waiting_report') $p2Step = 1;
+                                                    elseif (in_array($p2Status, ['report_submitted', 'report_review'])) $p2Step = 2;
+                                                    elseif (in_array($p2Status, ['report_completed', 'rejected'])) $p2Step = 3;
+                                                    
+                                                    $p2Width = ($p2Step > 0) ? (($p2Step - 1) / 2) * 100 : 0;
+                                                ?>
+                                                <div class="position-absolute start-0 bg-primary" style="height: 3px; top: 12px; width: <?= $p2Width ?>%; z-index: 0; left: 15px; transition: width 0.3s;"></div>
                                                 
                                                 <!-- Step 1 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
-                                                    <span class="rounded-circle <?= $p2Status !== 'not_started' ? 'bg-primary text-white' : 'bg-secondary text-white' ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                                                        <?php if ($p2Status !== 'not_started'): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>1<?php endif; ?>
+                                                    <span class="rounded-circle <?= $p2Step >= 1 ? 'bg-primary text-white' : 'bg-secondary text-white' ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($p2Step >= 1): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>1<?php endif; ?>
                                                     </span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">เตรียมหลักฐาน</div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">รอรายงานปีการศึกษา</div>
                                                 </div>
                                                 <!-- Step 2 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
-                                                    <?php $isP2Active = ($p2Status === 'in_review'); $isP2Done = in_array($p2Status, ['completed', 'rejected']); ?>
-                                                    <span class="rounded-circle <?= $isP2Done ? 'bg-primary text-white' : ($isP2Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                                                        <?php if ($isP2Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
+                                                    <?php $isP2Step2Done = $p2Step > 2; $isP2Step2Active = $p2Step === 2; ?>
+                                                    <span class="rounded-circle <?= $isP2Step2Done ? 'bg-primary text-white' : ($isP2Step2Active ? 'bg-warning text-dark' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP2Step2Done): ?><i class="fa-solid fa-check fs-8"></i><?php else: ?>2<?php endif; ?>
                                                     </span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;">การประเมินความรู้</div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;">ประเมินผลการเรียนรู้</div>
                                                 </div>
                                                 <!-- Step 3 -->
                                                 <div class="text-center position-relative" style="z-index: 1;">
-                                                    <?php $isP2Completed = ($p2Status === 'completed'); $isP2Rejected = ($p2Status === 'rejected'); ?>
-                                                    <span class="rounded-circle <?= $isP2Completed ? 'bg-success text-white' : ($isP2Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
-                                                        <?php if ($isP2Completed): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isP2Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>3<?php endif; ?>
+                                                    <?php $isP2Step3Completed = ($p2Status === 'report_completed'); $isP2Step3Rejected = ($p2Status === 'rejected'); ?>
+                                                    <span class="rounded-circle <?= $isP2Step3Completed ? 'bg-success text-white' : ($isP2Step3Rejected ? 'bg-danger text-white' : 'bg-secondary text-white') ?> d-inline-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                                                        <?php if ($isP2Step3Completed): ?><i class="fa-solid fa-check fs-8"></i><?php elseif ($isP2Step3Rejected): ?><i class="fa-solid fa-xmark fs-8"></i><?php else: ?>3<?php endif; ?>
                                                     </span>
-                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.75rem;"><?= $p2Status === 'rejected' ? 'ไม่ผ่านประเมิน' : 'ประเมินเสร็จสิ้น' ?></div>
+                                                    <div class="small text-muted mt-1 fw-bold" style="font-size: 0.7rem;"><?= $p2Status === 'rejected' ? 'ไม่ผ่านประเมิน' : 'ประเมินเสร็จสิ้น' ?></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -418,6 +457,29 @@
                                             </div>
                                             <button type="submit" class="btn btn-danger py-2 px-4 fw-bold">
                                                 <i class="fa-solid fa-cloud-arrow-up me-2"></i>อัปโหลดไฟล์แก้ข้อเสนอ
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Upload Process 2 Learning Report panel -->
+                            <?php if (in_array($request['process_2_status'], ['waiting_report', 'report_review'])): ?>
+                                <div class="card border-primary bg-primary bg-opacity-10 rounded-3 mb-4">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold text-primary mb-2"><i class="fa-solid fa-cloud-arrow-up me-2 animate-bounce"></i>อัปโหลดรายงานผลการจัดการศึกษาประจำปี</h5>
+                                        <p class="text-secondary small mb-3">กรุณาแนบเอกสารไฟล์ PDF รายงานการประเมินผลการเรียนรู้ของวิชาและกิจกรรมต่างๆ ของผู้เรียน</p>
+                                        
+                                        <form action="" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                                            <?= \App\Middleware\CsrfMiddleware::getHtmlField() ?>
+                                            <input type="hidden" name="action" value="upload_report">
+                                            
+                                            <div class="mb-3">
+                                                <input type="file" name="report_file" accept="application/pdf" class="form-control" required>
+                                                <div class="invalid-feedback">กรุณาเลือกไฟล์ PDF รายงานผลการประเมิน</div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary py-2 px-4 fw-bold text-white">
+                                                <i class="fa-solid fa-paper-plane me-2"></i>ส่งรายงานการประเมินผลการศึกษา
                                             </button>
                                         </form>
                                     </div>
