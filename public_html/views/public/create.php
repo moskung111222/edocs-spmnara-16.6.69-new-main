@@ -87,11 +87,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Password field for existing accounts -->
+                                <!-- Password field -->
                                 <div class="mb-4 bg-light p-3 rounded-3 border">
-                                    <label for="account_password" class="form-label fw-bold text-teal">รหัสผ่านเข้าใช้งาน <span class="text-secondary small">(ระบุเฉพาะเมื่อท่านเคยยื่นคำขอในระบบนี้แล้ว)</span></label>
-                                    <input type="password" class="form-control py-2 rounded-3" id="account_password" name="account_password" placeholder="ระบุรหัสผ่านบัญชีของท่าน">
-                                    <div class="form-text text-muted small">เว้นว่างไว้หากเป็นการยื่นคำขอเป็นครั้งแรก ระบบจะทำการสร้างบัญชีและรหัสผ่านชั่วคราวให้ท่านโดยอัตโนมัติ</div>
+                                    <label for="account_password" class="form-label fw-bold text-teal">กำหนดรหัสผ่านเข้าใช้งาน <span class="text-danger">*</span></label>
+                                    <input type="password" class="form-control py-2 rounded-3" id="account_password" name="account_password" required placeholder="ระบุรหัสผ่านเข้าใช้งานของท่าน (อย่างน้อย 6 ตัวอักษร)">
+                                    <div class="invalid-feedback">กรุณาระบุรหัสผ่านสำหรับการติดตามคำขอ</div>
+                                    <div class="form-text text-muted small">ใช้สำหรับเข้าสู่ระบบติดตามสถานะคำขอในอนาคต (หากท่านเคยยื่นคำขอแล้ว ให้ป้อนรหัสผ่านเดิมเพื่อเชื่อมโยงข้อมูลคำขอใหม่นี้)</div>
                                 </div>
 
                                 <!-- Section 2: Request Detail -->

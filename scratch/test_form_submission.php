@@ -36,6 +36,7 @@ $postData = [
     'full_name' => 'นายทดสอบ ระบบ',
     'email' => 'tester_' . uniqid() . '@spmnara.go.th',
     'phone' => '0812345678',
+    'account_password' => 'mypassword123',
     'form_data[school_name]' => 'โรงเรียนนราธิวาสราชนครินทร์',
     'form_data[grad_year]' => '2565',
     'form_data[purpose]' => 'ศึกษาต่อ',

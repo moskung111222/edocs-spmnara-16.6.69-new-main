@@ -142,7 +142,15 @@ class RequestController {
 
                 // Create applicant if new
                 if (!$applicantId) {
-                    $generatedPassword = $this->generateRandomPassword(8);
+                    $inputPassword = trim($_POST['account_password'] ?? '');
+                    if (empty($inputPassword)) {
+                        throw new Exception("กรุณากำหนดรหัสผ่านสำหรับการเข้าใช้งาน");
+                    }
+                    if (mb_strlen($inputPassword) < 6) {
+                        throw new Exception("รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร");
+                    }
+                    $generatedPassword = $inputPassword;
+
                     $year = date('Y');
                     $latestNum = ApplicantAccount::getLatestCodeNumberForYear($year);
                     $nextNum = $latestNum + 1;
