@@ -7,14 +7,14 @@ class CsrfMiddleware {
      */
     public static function init() {
         if (session_status() === PHP_SESSION_NONE) {
-            // Set secure cookies if connection is secure
-            $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
-            $domain = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '';
+            // Set secure cookies if connection is secure (including behind reverse proxy / SSL termination)
+            $secure = (isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] == 1)) ||
+                      (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+                      (isset($_SERVER['HTTP_FRONT_END_HTTPS']) && $_SERVER['HTTP_FRONT_END_HTTPS'] === 'on');
             
-            // Fix Chrome/browsers rejecting cookies on 'localhost' or local domain when explicitly set
-            if ($domain === 'localhost' || strpos($domain, '.') === false) {
-                $domain = '';
-            }
+            // Leaving the domain empty allows the browser to default to the current host of the request.
+            // This is the most compatible behavior across localhost, IP addresses, subdomains, and production domains.
+            $domain = '';
 
             session_set_cookie_params([
                 'lifetime' => 0,
